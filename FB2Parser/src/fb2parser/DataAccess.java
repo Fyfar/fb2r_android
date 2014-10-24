@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
 public class DataAccess {
 
     public static Collection<String> OpenFile(String path) throws Exception {
-        Collection list = new ArrayList<String>();
+        Collection list = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
@@ -54,28 +54,22 @@ public class DataAccess {
         }
     }
 
-    public static void tryToParseXML(String path) throws ParserConfigurationException, SAXException, IOException {
+    public static void tryToParseXML(String path)
+            throws ParserConfigurationException, SAXException, IOException {
         // упрощенный пример 
         File f = new File(path);
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         org.w3c.dom.Document document = builder.parse(f);
         Element root = document.getDocumentElement();
-        // для простоты сразу берем message
-        Element message = (Element) root.getElementsByTagName("author").item(0);
-        String textContent = message.getTextContent(); // тоже для упрощения
-        System.out.println(textContent);
-        message = (Element) root.getElementsByTagName("title-info").item(0);
-        textContent = message.getTextContent(); // тоже для упрощения
-        System.out.println(textContent);
-        message = (Element) root.getElementsByTagName("document-info").item(0);
-        textContent = message.getTextContent(); // тоже для упрощения
-        System.out.println(textContent);
-        message = (Element) root.getElementsByTagName("description").item(0);
-        textContent = message.getTextContent(); // тоже для упрощения
-        System.out.println(textContent);
-        message = (Element) root.getElementsByTagName("publish-info").item(0);
-        textContent = message.getTextContent(); // тоже для упрощения
-        System.out.println(textContent);
+    }
+
+    public static org.w3c.dom.Document getParsedToDocumentBook(String path)
+            throws ParserConfigurationException, SAXException, IOException {
+        File f = new File(path);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        org.w3c.dom.Document document = builder.parse(f);
+        return document;
     }
 }
