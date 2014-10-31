@@ -27,11 +27,11 @@ public class BookInfo {
         publish_info = new ArrayList<>();
         custom_info = new ArrayList<>();
         this.document = document;
-        //setAuthorsInfo();
-        //setCustomInfo();
-        //setGenre();
-        //setPublishInfo();
-        //setTranslator();
+        setAuthorsInfo();
+        setCustomInfo();
+        setGenre();
+        setPublishInfo();
+        setTranslator();
     }
 
     private void setInfo(String tag, Collection<String> collection) {

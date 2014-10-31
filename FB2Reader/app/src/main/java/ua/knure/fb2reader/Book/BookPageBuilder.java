@@ -7,24 +7,22 @@ import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Created by Александр on 29.10.2014.
  */
 public class BookPageBuilder {
+    private final String WITHOUT_TITLE = null;
     private Collection<BookPage> pages;
     private Document book;
-
     private int linesAmount;
     private int linesLength;
 
-    public BookPageBuilder(Document book, int characterWidth,
-                           int characterHeight, int screenWidth, int screenHeight) {
+    public BookPageBuilder(Document book, int charactersPerLine, int linesPerPage) {
         this.book = book;
         pages = new ArrayList<>();
-        linesAmount = screenHeight / characterHeight;
-        linesLength = screenWidth / characterWidth;
+        linesAmount = linesPerPage;
+        linesLength = charactersPerLine;
     }
 
     /*
@@ -38,13 +36,14 @@ public class BookPageBuilder {
             -p
         -section ... again in the cycle
     * */
-    public void buildPages() {
+    public Collection<BookPage> buildPages() {
         Element root = book.getDocumentElement();
         NodeList listOfTags = root.getElementsByTagName("section");
         int listOfTagsLength = listOfTags.getLength();
         for (int i = 0; i < listOfTagsLength; i++) {
             buildPagesBySection(listOfTags.item(i));
         }
+        return pages;
     }
 
     private void buildPagesBySection(Node item) {
@@ -57,66 +56,50 @@ public class BookPageBuilder {
 
     private void buildPageByParagraphs(NodeList p) {
         int paragraphAmount = p.getLength();
-        for (int i = 1; i < paragraphAmount; i++) {
+        for (int i = 1; i < paragraphAmount; i++) {// start from 1 because element 0 is a title
             createPagesForCurrentParagraph(p.item(i));
         }
     }
 
     private void createPagesForCurrentParagraph(Node item) {
-        BookPage page = new BookPage(null, linesAmount);
+        BookPage page = new BookPage(WITHOUT_TITLE, linesAmount);
+
         Element currentParagraph = (Element) item;
         String[] text = currentParagraph.getTextContent().split(" ");
-        StringBuilder stringBuilder;
-        StringBuilder temp;
+
+        StringBuilder currentLine;
+        StringBuilder tempLine;
+
+        int numberOfWord = 0; //usually it is a last word in the line
+
+        //int numberOfCurrentLine = 0;//only for debug
+
+
         for (int i = 0; i < text.length; i++) {
-            stringBuilder = new StringBuilder();
-            temp = new StringBuilder();
-            for (int j = i; j < text.length; j++) {
-                temp.append(text[j] + " ");
-                if (temp.length() < linesLength) {
-                    stringBuilder.append(text[j] + " ");
-                } else {
-                    i = j;
-                    break;
+
+            currentLine = new StringBuilder();
+            tempLine = new StringBuilder();
+
+            String tempWord = "";
+            while (tempLine.length() < linesLength && numberOfWord < text.length) {
+                if (!tempLine.toString().isEmpty()) {
+                    currentLine.append(tempWord);
                 }
+                tempWord = text[numberOfWord++] + " ";
+                tempLine.append(tempWord);
             }
-            if (page.hasPlaceForAddLine()) {
-                try {
-                    page.addTextLine(stringBuilder.toString());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            i = numberOfWord;
+
+            if (page.isNotFull() && numberOfWord < text.length) {
+                //numberOfCurrentLine++;
+                page.addTextLine(currentLine.toString());
             } else {
                 pages.add(page);
+                //numberOfCurrentLine = 0;
                 page = new BookPage(null, linesAmount);
+                page.addTextLine(currentLine.toString());
             }
-
+            //System.out.println(" -- count of lines :" + numberOfCurrentLine);
         }
-    }
-
-    public Collection<BookPage> getPages() {
-        return pages;
-    }
-
-
-    private void setInfo(String tag, Collection<String> collection) {//this method only for testing
-        Element root = book.getDocumentElement();
-
-        int count = root.getElementsByTagName(tag).getLength();
-        for (int i = 0; i < count; i++) {
-            Element message = (Element) root.getElementsByTagName(tag).item(i);
-            collection.add(message.getTextContent());
-        }
-    }
-
-    public String getAllText() {//this method only for testing
-        Collection<String> col = new ArrayList<>();
-        setInfo("section", col);
-        Iterator<String> iter = col.iterator();
-        StringBuilder str = new StringBuilder();
-        while (iter.hasNext()) {
-            str.append(iter.next());
-        }
-        return str.toString();
     }
 }

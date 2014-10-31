@@ -10,33 +10,29 @@ public class BookPage {
     private Collection<String> lines;
     private boolean hasTitle;
     private String title;
-    private int amount;
+    private int amountOfLines;
 
-    public BookPage(String title, int amount) {
-        this.amount = amount;
+    public BookPage(String title, int amountOfLines) {
+        this.amountOfLines = amountOfLines;
         lines = new ArrayList<>();
         if (title != null && title != "") {
             hasTitle = true;
             this.title = title;
-            try {
-                addTextLine(title + "\n");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            amount--;
+            addTextLine(title + "\n");
+            amountOfLines--;
         }
     }
 
-    public void addTextLine(String line) throws Exception {
-        if (hasPlaceForAddLine()) {
+    public void addTextLine(String line) {
+        if (isNotFull()) {
             lines.add(line + "\n");
         } else {
-            throw new Exception("Page is full");
+            throw new RuntimeException("Page is full");
         }
     }
 
-    public boolean hasPlaceForAddLine() {
-        return lines != null && lines.size() < amount;
+    public boolean isNotFull() {
+        return lines.size() < amountOfLines;
     }
 
     public Collection<String> getLines() {

@@ -24,8 +24,8 @@ public class BookPageView extends Activity {
 
     private int characterWidth;
     private int characterHeight;
-    private int screenWidth;
-    private int screenHeight;
+    private int linesPerScreen;
+    private int lineLength;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,13 +33,17 @@ public class BookPageView extends Activity {
         setContentView(R.layout.activity_book_page);
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        screenWidth = metrics.widthPixels;
-        screenHeight = metrics.heightPixels;
-        characterHeight = 5;
-        characterWidth = 5;
+
+        characterHeight = 20; // i don't know what a size of character, so i use random value
+        characterWidth = 20;
+        linesPerScreen = metrics.heightPixels / characterHeight;
+        lineLength = metrics.widthPixels / characterWidth;
 
         TextView view = (TextView) findViewById(R.id.pageView);
         view.setTypeface(Typeface.MONOSPACE);
+        view.setMaxLines(Integer.MAX_VALUE);
+        //view.setTextScaleX(1.6f); // something like justify, but isn't good
+
         openBook();
     }
 
@@ -66,37 +70,29 @@ public class BookPageView extends Activity {
         TextView view = (TextView) findViewById(R.id.pageView);
         File currentBook = DataAccess.openBook(Environment.getExternalStorageDirectory() + "/.fb2reader/sample.xml");
         try {
-            Toast.makeText(this.getApplicationContext(), "int try", Toast.LENGTH_LONG);
+            //Toast.makeText(this.getApplicationContext(), "method::openBook", Toast.LENGTH_SHORT);//for debug
             org.w3c.dom.Document doc = Parser.getParsedBook(currentBook);
-
-            Book book = new Book(doc, 0);
-            book.setMetrics(characterWidth, characterHeight, screenWidth, screenHeight);
-            book.createPages();
-            Toast.makeText(this.getApplicationContext(), "create page", Toast.LENGTH_LONG);
-            //Log.d("Book", "create");
-
+            Book book = new Book(doc, lineLength, linesPerScreen, 0);
+            //Toast.makeText(this.getApplicationContext(), "Book is created and parsed", Toast.LENGTH_SHORT);//for debug
             view.setMovementMethod(new ScrollingMovementMethod());
             Collection<BookPage> pages = book.getPages();
-
-            Toast.makeText(this.getApplicationContext(), "pages length " + pages.size(), Toast.LENGTH_LONG);
-
-            //Log.d(pages.size()+": size", "pages");
-            //view.setText(book.getAllText());
+            //Toast.makeText(this.getApplicationContext(), "pages amount:: " + pages.size(), Toast.LENGTH_LONG);//for debug
             Iterator<BookPage> iterator = pages.iterator();
+            //int counter = 0;//for debug
+
             while (iterator.hasNext()) {
-                String str[] = iterator.next().getLines().toArray(new String[iterator.next().getLines().size()]);
-                Toast.makeText(this.getApplicationContext(), "while ", Toast.LENGTH_LONG).show();
+                Collection<String> temp = iterator.next().getLines();
+                String str[] = temp.toArray(new String[temp.size()]);
+
                 for (int i = 0; i < str.length; i++) {
                     view.append(str[i]);
                 }
-
+                //Toast.makeText(this.getApplicationContext(), "while " + counter++, Toast.LENGTH_LONG).show();//for debug
             }
-            //Toast.makeText(this.getApplicationContext(), "Success ", Toast.LENGTH_LONG).show();
+            Toast.makeText(this.getApplicationContext(), "Success downloading (parsing) book", Toast.LENGTH_LONG).show();
         } catch (Exception ex) {
-            Toast.makeText(this.getApplicationContext(), "Exception: " + ex.getMessage(), Toast.LENGTH_LONG).show();
-
-            System.out.println(ex.getMessage());
+            Toast.makeText(this.getApplicationContext(), "" + ex.getMessage() + "\n" + ex.getStackTrace().toString(), Toast.LENGTH_LONG).show();
+            ex.printStackTrace();
         }
-        Toast.makeText(this.getApplicationContext(), Environment.getExternalStorageDirectory().toString(), Toast.LENGTH_LONG);
     }
 }
