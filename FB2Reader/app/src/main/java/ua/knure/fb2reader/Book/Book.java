@@ -32,6 +32,7 @@ public class Book {
     private void createPages() {
         BookPageBuilder builder = new BookPageBuilder(book, charactersPerLine, linesPerPage);
         pages = builder.buildPages();
+        int stop = 0;
     }
 
     public Collection<BookPage> getPages() {

@@ -17,6 +17,7 @@ public class BookPageBuilder {
     private Document book;
     private int linesAmount;
     private int linesLength;
+    private BookPage tempPage; //for new algorithm
 
     public BookPageBuilder(Document book, int charactersPerLine, int linesPerPage) {
         this.book = book;
@@ -50,7 +51,8 @@ public class BookPageBuilder {
         Element current = (Element) item;
         String title = current.getElementsByTagName("title").item(0).getTextContent();
         BookPage page = new BookPage(title, linesAmount);
-        pages.add(page);
+        //pages.add(page); // comment for new algorithm
+        tempPage = page; //add for new algorithm logic
         buildPageByParagraphs(current.getElementsByTagName("p"));
     }
 
@@ -62,7 +64,13 @@ public class BookPageBuilder {
     }
 
     private void createPagesForCurrentParagraph(Node item) {
-        BookPage page = new BookPage(WITHOUT_TITLE, linesAmount);
+        BookPage page;
+        if (tempPage==null){
+            page = new BookPage(WITHOUT_TITLE, linesAmount);
+            tempPage = page;// add for new algorithm
+        } else {
+            page = tempPage;
+        }
 
         Element currentParagraph = (Element) item;
         String[] text = currentParagraph.getTextContent().split(" ");
@@ -72,14 +80,33 @@ public class BookPageBuilder {
 
         int numberOfWord = 0; //usually it is a last word in the line
 
-        //int numberOfCurrentLine = 0;//only for debug
-
-
-        for (int i = 0; i < text.length; i++) {
-
+        while (numberOfWord < text.length - 1){
             currentLine = new StringBuilder();
             tempLine = new StringBuilder();
+            String tempWord = "";
+            int lastWord = numberOfWord;
+            while (tempLine.length() < linesLength && numberOfWord < text.length-1) {
+                tempWord = text[numberOfWord++] + " ";
+                tempLine.append(tempWord);
+            }
+            while (lastWord <= numberOfWord){
+                tempWord = text[lastWord++] + " ";
+                currentLine.append(tempWord);
+            }
 
+            if (page.isNotFull() && numberOfWord < text.length) {
+                page.addTextLine(currentLine.toString());
+            } else {
+                pages.add(page);
+                page = new BookPage(null, linesAmount);
+                page.addTextLine(currentLine.toString());
+                tempPage = page; // add for new algorithm
+            }
+            numberOfWord++;// = lastWord;
+        }
+        /*for (int i = 0; i < text.length; i++) {
+            currentLine = new StringBuilder();
+            tempLine = new StringBuilder();
             String tempWord = "";
             while (tempLine.length() < linesLength && numberOfWord < text.length) {
                 if (!tempLine.toString().isEmpty()) {
@@ -90,16 +117,21 @@ public class BookPageBuilder {
             }
             i = numberOfWord;
 
+
+            //i = numberOfWord;
+
             if (page.isNotFull() && numberOfWord < text.length) {
                 //numberOfCurrentLine++;
                 page.addTextLine(currentLine.toString());
-            } else {
+            } else if (!page.isNotFull()){
                 pages.add(page);
                 //numberOfCurrentLine = 0;
                 page = new BookPage(null, linesAmount);
                 page.addTextLine(currentLine.toString());
+                tempPage = page; // add for new algorithm
             }
+
             //System.out.println(" -- count of lines :" + numberOfCurrentLine);
-        }
+        }*/
     }
 }

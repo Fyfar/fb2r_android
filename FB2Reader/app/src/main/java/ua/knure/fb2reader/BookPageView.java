@@ -5,9 +5,10 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.method.ScrollingMovementMethod;
-import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,29 +23,69 @@ import ua.knure.fb2reader.DataAccess.DataAccess;
 
 public class BookPageView extends Activity {
 
-    private int characterWidth;
-    private int characterHeight;
     private int linesPerScreen;
     private int lineLength;
+    private StringBuilder builder;
+    private Thread threadForOpenBook;
+
+    private boolean isTooLarge(TextView text, String newText) {
+        float textWidth = text.getPaint().measureText(newText);
+        float temp = text.getMeasuredWidth();
+        return (textWidth >= text.getMeasuredWidth());
+    }
+
+    private boolean isTooLargeHeight(TextView text, String newText) {
+        float textHeight = text.getPaint().measureText(newText);
+        float temp = text.getMeasuredHeight();
+        return (textHeight >= text.getMeasuredHeight());
+    }
+
+    private int getLineWidth() {
+        int width = 0;
+        TextView view = (TextView) findViewById(R.id.pageView);
+        StringBuilder sb = new StringBuilder();
+        while (!isTooLarge(view, sb.append("w").toString())) {
+            width++;
+        }
+        return width;
+    }
+
+    private int getLineHeight() {
+        int height = 0;
+        TextView view = (TextView) findViewById(R.id.pageView);
+        StringBuilder sb = new StringBuilder();
+        while (!isTooLargeHeight(view, sb.append("w\n").toString())) {
+            height++;
+        }
+        return height;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_page);
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+builder = new StringBuilder();
 
-        characterHeight = 20; // i don't know what a size of character, so i use random value
-        characterWidth = 20;
-        linesPerScreen = metrics.heightPixels / characterHeight;
-        lineLength = metrics.widthPixels / characterWidth;
-
-        TextView view = (TextView) findViewById(R.id.pageView);
+        final TextView view = (TextView) findViewById(R.id.pageView);
         view.setTypeface(Typeface.MONOSPACE);
         view.setMaxLines(Integer.MAX_VALUE);
-        //view.setTextScaleX(1.6f); // something like justify, but isn't good
 
-        openBook();
+        //view.setTextScaleX(1.6f); // something like justify, but isn'threadForOpenBook good
+
+        //characterWidth = 20;
+
+        Button b = (Button) findViewById(R.id.myButton);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                linesPerScreen = 55;//getLineHeight();//metrics.heightPixels / characterHeight;
+                lineLength = 55;//getLineWidth();//metrics.widthPixels / characterWidth;
+                //view.append("hello world");
+                //System.out.print("I tup on the screen");
+                openBook();
+            }
+        });
+
     }
 
     @Override
@@ -85,10 +126,14 @@ public class BookPageView extends Activity {
                 String str[] = temp.toArray(new String[temp.size()]);
 
                 for (int i = 0; i < str.length; i++) {
-                    view.append(str[i]);
+                    //view.append(str[i]);
+                    builder.append(str[i]);
                 }
+                //view.append("\n***Next_Page***\n");
+                builder.append("\n***Next_page***\n");
                 //Toast.makeText(this.getApplicationContext(), "while " + counter++, Toast.LENGTH_LONG).show();//for debug
             }
+            view.setText(builder.toString());
             Toast.makeText(this.getApplicationContext(), "Success downloading (parsing) book", Toast.LENGTH_LONG).show();
         } catch (Exception ex) {
             Toast.makeText(this.getApplicationContext(), "" + ex.getMessage() + "\n" + ex.getStackTrace().toString(), Toast.LENGTH_LONG).show();

@@ -9,10 +9,13 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:textSize="32sp"
+
         android:autoText="true"
-
-
         android:scrollbars = "vertical"
         android:id="@+id/pageView" />
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="20px"
+        android:id="@+id/myButton"
+        android:text="openBook"/>
 </RelativeLayout>
