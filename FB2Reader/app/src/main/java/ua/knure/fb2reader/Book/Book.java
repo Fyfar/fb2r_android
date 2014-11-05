@@ -13,16 +13,16 @@ public class Book {
     private Document book;
     private BookInfo info;
     private Collection<BookPage> pages;
-    private int lastPage;
+    private int numberOfLastPage;
     private int charactersPerLine;
     private int linesPerPage;
 
-    public Book(Document book, int charactersPerLine, int linesPerPage, int lastPage) {//Parsed document(book)
+    public Book(Document book, int charactersPerLine, int linesPerPage, int numberOfLastPage) {//Parsed document(book)
         this.book = book;
         this.charactersPerLine = charactersPerLine;
         this.linesPerPage = linesPerPage;
-        if (lastPage >= 0) {
-            this.lastPage = lastPage;
+        if (numberOfLastPage >= 0) {
+            this.numberOfLastPage = numberOfLastPage;
         }
         info = new BookInfo(book);
         pages = new ArrayList<>();
@@ -32,7 +32,6 @@ public class Book {
     private void createPages() {
         BookPageBuilder builder = new BookPageBuilder(book, charactersPerLine, linesPerPage);
         pages = builder.buildPages();
-        int stop = 0;
     }
 
     public Collection<BookPage> getPages() {

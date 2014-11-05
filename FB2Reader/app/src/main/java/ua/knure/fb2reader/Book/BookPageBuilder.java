@@ -13,15 +13,15 @@ import java.util.Collection;
  */
 public class BookPageBuilder {
     private final String WITHOUT_TITLE = null;
-    private Collection<BookPage> pages;
+    private Collection<BookPage> bookPages;
     private Document book;
     private int linesAmount;
     private int linesLength;
-    private BookPage tempPage; //for new algorithm
+    private BookPage lastTempPage;
 
     public BookPageBuilder(Document book, int charactersPerLine, int linesPerPage) {
         this.book = book;
-        pages = new ArrayList<>();
+        bookPages = new ArrayList<>();
         linesAmount = linesPerPage;
         linesLength = charactersPerLine;
     }
@@ -32,7 +32,7 @@ public class BookPageBuilder {
         -section
             -title
             -section
-                -title //now its working without recursion
+                -title
                     -....same actions
             -p
         -section ... again in the cycle
@@ -44,94 +44,56 @@ public class BookPageBuilder {
         for (int i = 0; i < listOfTagsLength; i++) {
             buildPagesBySection(listOfTags.item(i));
         }
-        return pages;
+        return bookPages;
     }
 
     private void buildPagesBySection(Node item) {
         Element current = (Element) item;
         String title = current.getElementsByTagName("title").item(0).getTextContent();
         BookPage page = new BookPage(title, linesAmount);
-        //pages.add(page); // comment for new algorithm
-        tempPage = page; //add for new algorithm logic
+        lastTempPage = page;
         buildPageByParagraphs(current.getElementsByTagName("p"));
     }
 
     private void buildPageByParagraphs(NodeList p) {
         int paragraphAmount = p.getLength();
-        for (int i = 1; i < paragraphAmount; i++) {// start from 1 because element 0 is a title
+        for (int i = 1; i < paragraphAmount; i++) {// start from 1 because element 0 is a paragraph in the title
             createPagesForCurrentParagraph(p.item(i));
         }
     }
 
     private void createPagesForCurrentParagraph(Node item) {
-        BookPage page;
-        if (tempPage==null){
-            page = new BookPage(WITHOUT_TITLE, linesAmount);
-            tempPage = page;// add for new algorithm
+        BookPage currentPage;
+        if (lastTempPage == null) {
+            currentPage = new BookPage(WITHOUT_TITLE, linesAmount);
+            lastTempPage = currentPage;
         } else {
-            page = tempPage;
+            currentPage = lastTempPage;
         }
-
         Element currentParagraph = (Element) item;
-        String[] text = currentParagraph.getTextContent().split(" ");
-
+        String[] textInCurrentParagraph = currentParagraph.getTextContent().split(" ");
         StringBuilder currentLine;
         StringBuilder tempLine;
-
-        int numberOfWord = 0; //usually it is a last word in the line
-
-        while (numberOfWord < text.length - 1){
+        int numberOfCurrentWord = 0; //usually it is a last word in the line
+        while (numberOfCurrentWord < textInCurrentParagraph.length - 1) {
             currentLine = new StringBuilder();
             tempLine = new StringBuilder();
-            String tempWord = "";
-            int lastWord = numberOfWord;
-            while (tempLine.length() < linesLength && numberOfWord < text.length-1) {
-                tempWord = text[numberOfWord++] + " ";
-                tempLine.append(tempWord);
+            int lastWord = numberOfCurrentWord;
+            while (tempLine.length() < linesLength && numberOfCurrentWord < textInCurrentParagraph.length - 1) {
+                tempLine.append(textInCurrentParagraph[numberOfCurrentWord++] + " ");
             }
-            while (lastWord <= numberOfWord){
-                tempWord = text[lastWord++] + " ";
-                currentLine.append(tempWord);
+            while (lastWord <= numberOfCurrentWord) {
+                currentLine.append(textInCurrentParagraph[lastWord++] + " ");
             }
-
-            if (page.isNotFull() && numberOfWord < text.length) {
-                page.addTextLine(currentLine.toString());
+            if (currentPage.isNotFull() && numberOfCurrentWord < textInCurrentParagraph.length) {
+                currentPage.addTextLine(currentLine.toString() + "**");//"**" - only for debug
             } else {
-                pages.add(page);
-                page = new BookPage(null, linesAmount);
-                page.addTextLine(currentLine.toString());
-                tempPage = page; // add for new algorithm
+                bookPages.add(currentPage);
+                currentPage = new BookPage(null, linesAmount);
+                currentPage.addTextLine(currentLine.toString() + "**"); //"**" - only for debug
+                lastTempPage = currentPage; // add for new algorithm
             }
-            numberOfWord++;// = lastWord;
+            numberOfCurrentWord++; // we take next word for new iteration
         }
-        /*for (int i = 0; i < text.length; i++) {
-            currentLine = new StringBuilder();
-            tempLine = new StringBuilder();
-            String tempWord = "";
-            while (tempLine.length() < linesLength && numberOfWord < text.length) {
-                if (!tempLine.toString().isEmpty()) {
-                    currentLine.append(tempWord);
-                }
-                tempWord = text[numberOfWord++] + " ";
-                tempLine.append(tempWord);
-            }
-            i = numberOfWord;
-
-
-            //i = numberOfWord;
-
-            if (page.isNotFull() && numberOfWord < text.length) {
-                //numberOfCurrentLine++;
-                page.addTextLine(currentLine.toString());
-            } else if (!page.isNotFull()){
-                pages.add(page);
-                //numberOfCurrentLine = 0;
-                page = new BookPage(null, linesAmount);
-                page.addTextLine(currentLine.toString());
-                tempPage = page; // add for new algorithm
-            }
-
-            //System.out.println(" -- count of lines :" + numberOfCurrentLine);
-        }*/
     }
 }

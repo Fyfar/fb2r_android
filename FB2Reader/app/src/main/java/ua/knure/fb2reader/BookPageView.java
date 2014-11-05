@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,15 +29,13 @@ public class BookPageView extends Activity {
     private StringBuilder builder;
     private Thread threadForOpenBook;
 
-    private boolean isTooLarge(TextView text, String newText) {
+    private boolean isToLargeWidth(TextView text, String newText) {
         float textWidth = text.getPaint().measureText(newText);
-        float temp = text.getMeasuredWidth();
         return (textWidth >= text.getMeasuredWidth());
     }
 
     private boolean isTooLargeHeight(TextView text, String newText) {
         float textHeight = text.getPaint().measureText(newText);
-        float temp = text.getMeasuredHeight();
         return (textHeight >= text.getMeasuredHeight());
     }
 
@@ -44,10 +43,10 @@ public class BookPageView extends Activity {
         int width = 0;
         TextView view = (TextView) findViewById(R.id.pageView);
         StringBuilder sb = new StringBuilder();
-        while (!isTooLarge(view, sb.append("w").toString())) {
+        while (!isToLargeWidth(view, sb.append("w_").toString())) {
             width++;
         }
-        return width;
+        return width;// - width/4 - 2 - 4;
     }
 
     private int getLineHeight() {
@@ -57,14 +56,14 @@ public class BookPageView extends Activity {
         while (!isTooLargeHeight(view, sb.append("w\n").toString())) {
             height++;
         }
-        return height;
+        return height - height/3;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_page);
-builder = new StringBuilder();
+        builder = new StringBuilder();
 
         final TextView view = (TextView) findViewById(R.id.pageView);
         view.setTypeface(Typeface.MONOSPACE);
@@ -78,13 +77,24 @@ builder = new StringBuilder();
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                linesPerScreen = 55;//getLineHeight();//metrics.heightPixels / characterHeight;
-                lineLength = 55;//getLineWidth();//metrics.widthPixels / characterWidth;
+                linesPerScreen = getLineHeight();
+                lineLength = getLineWidth();
                 //view.append("hello world");
                 //System.out.print("I tup on the screen");
                 openBook();
             }
         });
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                linesPerScreen = getLineHeight();//metrics.heightPixels / characterHeight;
+                lineLength = getLineWidth();//metrics.widthPixels / characterWidth;
+                //view.append("hello world");
+                //System.out.print("I tup on the screen");
+                openBook();
+            }
+        }, 2000);
+
 
     }
 

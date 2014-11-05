@@ -18,7 +18,7 @@ public class BookPage {
         if (title != null && title != "") {
             hasTitle = true;
             this.title = title;
-            addTextLine(title + "\n");
+            addTextLine(title);
             amountOfLines--;
         }
     }
