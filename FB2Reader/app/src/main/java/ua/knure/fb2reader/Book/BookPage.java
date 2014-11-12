@@ -11,10 +11,12 @@ public class BookPage {
     private boolean hasTitle;
     private String title;
     private int amountOfLines;
+    private int pageNumber;
 
-    public BookPage(String title, int amountOfLines) {
+    public BookPage(String title, int amountOfLines, int pageNumber) {
         this.amountOfLines = amountOfLines;
         lines = new ArrayList<>();
+        this.pageNumber = pageNumber;
         if (title != null && title != "") {
             hasTitle = true;
             this.title = title;
@@ -37,5 +39,9 @@ public class BookPage {
 
     public Collection<String> getLines() {
         return lines;
+    }
+
+    public int getPageNumber() {
+        return pageNumber;
     }
 }
