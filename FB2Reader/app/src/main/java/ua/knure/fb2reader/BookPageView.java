@@ -93,17 +93,14 @@ public class BookPageView extends Activity {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         view.scrollTo(0, progress);
-
                     }
 
                     @Override
                     public void onStartTrackingTouch(SeekBar seekBar) {
-
                     }
 
                     @Override
                     public void onStopTrackingTouch(SeekBar seekBar) {
-
                     }
                 });
             }
@@ -145,7 +142,7 @@ public class BookPageView extends Activity {
                 for (int i = 0; i < str.length; i++) {
                     builder.append(str[i]);
                 }
-                builder.append("\n***Page :" + page.getPageNumber() + " ***\n\n");
+                builder.append("*\n***Page : " + page.getPageNumber() + " ***\n*\n");
             }
             view.setText(builder.toString());
             Toast.makeText(this.getApplicationContext(), "Success (parsing) book of " + book.getPages().size() + " pages", Toast.LENGTH_LONG).show();
