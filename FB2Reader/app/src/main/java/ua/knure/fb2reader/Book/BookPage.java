@@ -8,8 +8,6 @@ import java.util.Collection;
  */
 public class BookPage {
     private Collection<String> lines;
-    private boolean hasTitle;
-    private String title;
     private int amountOfLines;
     private int pageNumber;
 
@@ -18,10 +16,7 @@ public class BookPage {
         lines = new ArrayList<>();
         this.pageNumber = pageNumber;
         if (title != null && title != "") {
-            hasTitle = true;
-            this.title = title;
             addTextLine(title);
-            amountOfLines--;
         }
     }
 

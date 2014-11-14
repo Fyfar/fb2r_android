@@ -17,12 +17,11 @@ import java.util.Queue;
 public class BookPageBuilder {
     private static final int WHITE_SPACE = 1;
     private final String WITHOUT_TITLE = null;
-    private final int MAXIMUM_PAGES = 3000;
     private Collection<BookPage> bookPages;
     private Document book;
     private int linesAmount;
     private int linesLength;
-    private BookPage lastTempPage;
+    private BookPage lastPage;
     private int pageNumber;
     private SyllablesPartitionable syllables;
 
@@ -30,115 +29,113 @@ public class BookPageBuilder {
         this.book = book;
         bookPages = new ArrayList<>();
         linesAmount = linesPerPage;
-        linesLength = charactersPerLine;// - charactersPerLine/4;
+        linesLength = charactersPerLine;
         pageNumber = 1;
         this.syllables = syllables;
     }
 
-    /*
-    Parsing by this queue
-        -bookinfo (has a parser)
-        -section
-            -title
-            -section
-                -title
-                    -....same actions
-            -p
-        -section ... again in the cycle
-    * */
     public Collection<BookPage> buildPages() {
         Element root = book.getDocumentElement();
         NodeList listOfTags = root.getElementsByTagName("section");
         int listOfTagsLength = listOfTags.getLength();
         for (int i = 0; i < listOfTagsLength; i++) {
-            buildPagesBySection(listOfTags.item(i));
+            Element listElement = (Element) listOfTags.item(i);
+            if (((Element) listElement.getParentNode()).getAttribute("name").equals("notes")) {
+                continue;
+            }
+            String name = listElement.getAttribute("name");
+            if (!name.equals("notes")) {
+                buildPagesBySection(listOfTags.item(i));
+                if (!bookPages.contains(lastPage)) {
+                    bookPages.add(lastPage);
+                }
+            }
         }
         return bookPages;
     }
 
     private void buildPagesBySection(Node item) {
         Element current = (Element) item;
-        String[] title = current.getElementsByTagName("title").item(0).getTextContent().split("\n");
-        Collection<String> col = new ArrayList<>();
-        for (int i = 0; i < title.length; i++) {
-            if (title[i] != null && title[i].length() > 0) {
-                col.add(title[i]);
-            }
-        }
-        //String tmp = current.getElementsByTagName("title").item(0).getTextContent();
+
+        BookPage page;
         NodeList p = current.getElementsByTagName("title");
-        Iterator<String> iterator = col.iterator();
-        BookPage page = new BookPage(iterator.next(), linesAmount, pageNumber++);
-        while (iterator.hasNext()) {
-            page.addTextLine(iterator.next());
+        boolean hasTitle = true;
+        try {
+            hasTitle = p.item(0).getTextContent().length() > 0;
+        } catch (NullPointerException ex) {
+            hasTitle = false;
         }
-        page.addTextLine(" ");
-        lastTempPage = page;
-        int numbersOfParagraphsInTitle = ((Element) p.item(0)).getElementsByTagName("p").getLength();
-        buildPageByParagraphs(current.getElementsByTagName("p"), numbersOfParagraphsInTitle);
+        if (hasTitle) {
+            String[] title = p.item(0).getTextContent().split("\n");
+            Collection<String> titleText = new ArrayList<>();
+            for (int i = 0; i < title.length; i++) {
+                if (title[i] != null && title[i].length() > 0) {
+                    titleText.add(title[i]);
+                }
+            }
+            Iterator<String> titleTextIterator = titleText.iterator();
+            page = new BookPage(titleTextIterator.next(), linesAmount, bookPages.size());
+            while (titleTextIterator.hasNext()) {
+                page.addTextLine(titleTextIterator.next());
+            }
+            page.addTextLine(" ");
+            lastPage = page;
+            int numbersOfParagraphsInTitle = ((Element) p.item(0)).getElementsByTagName("p").getLength();
+            buildPageByParagraphs(current.getElementsByTagName("p"), numbersOfParagraphsInTitle);
+        } else {
+            page = new BookPage("***", linesAmount, bookPages.size());
+            page.addTextLine(" ");
+            lastPage = page;
+            int numbersOfParagraphsInTitle = 0;
+            buildPageByParagraphs(current.getElementsByTagName("p"), numbersOfParagraphsInTitle);
+        }
     }
 
     private void buildPageByParagraphs(NodeList p, int numberOfParagraphsInTitle) {
         int paragraphAmount = p.getLength();
         for (int i = numberOfParagraphsInTitle; i < paragraphAmount; i++) {
             createPagesForCurrentParagraph(p.item(i));
-            if (pageNumber >= MAXIMUM_PAGES) break; //now its only for debug
         }
     }
 
     private void createPagesForCurrentParagraph(Node item) {
         BookPage currentPage;
-        if (lastTempPage == null) {
-            currentPage = new BookPage(WITHOUT_TITLE, linesAmount, pageNumber++);
-            lastTempPage = currentPage;
+        if (lastPage == null) {
+            currentPage = new BookPage(WITHOUT_TITLE, linesAmount, bookPages.size());
+            lastPage = currentPage;
         } else {
-            currentPage = lastTempPage;
+            currentPage = lastPage;
         }
-
         Element currentParagraph = (Element) item;
         String[] textInCurrentParagraph = currentParagraph.getTextContent().split(" ");
+
         StringBuilder tempLine;
+        Queue<String> queueOfWords = new LinkedList<>();
 
-        Queue<String> qu = new LinkedList<>();
         for (int i = 0; i < textInCurrentParagraph.length; i++) {
-
             String tempWord = textInCurrentParagraph[i];
             if (tempWord.length() + WHITE_SPACE >= linesLength) {
-                /*StringBuilder strBuildFirstPart = new StringBuilder();
-                StringBuilder strBuildSecondPart = new StringBuilder();
-                for (int j = 0; j < tempWord.length() / 2; j++) {
-                    strBuildFirstPart.append(tempWord.charAt(j));
-                }
-                for (int j = tempWord.length() / 2; j < tempWord.length(); j++) {
-                    strBuildSecondPart.append(tempWord.charAt(j));
-                }
-                strBuildFirstPart.append("-");
-                qu.add(strBuildFirstPart.toString());
-                qu.add(strBuildSecondPart.toString());*/
-                String[] parts = syllables.getWordSyllables(tempWord, linesLength);
-                for (int j = 0; j < parts.length; j++) {
-                    qu.add(parts[j]);
+                String[] wordSyllables = syllables.getWordSyllables(tempWord, linesLength);
+                for (int j = 0; j < wordSyllables.length; j++) {
+                    queueOfWords.add(wordSyllables[j]);
                 }
             } else {
-                qu.add(tempWord);
+                queueOfWords.add(tempWord);
             }
         }
-        while (!qu.isEmpty()) {
+        while (!queueOfWords.isEmpty()) {
             tempLine = new StringBuilder();
-            int len = tempLine.length() + qu.peek().length() + 1;
-            while (qu.peek() != null && tempLine.length() + qu.peek().length() + 1 < linesLength) {
-                tempLine.append(qu.poll() + " ");
+            while (queueOfWords.peek() != null && tempLine.length() + queueOfWords.peek().length() + 1 < linesLength) {
+                tempLine.append(" " + queueOfWords.poll());
             }
             if (currentPage.isNotFull()) {
-                currentPage.addTextLine(tempLine.toString() + "|");// + "*" + tempLine.toString().length() + ":" + linesLength);//"**" - only for debug
-
+                currentPage.addTextLine(tempLine.toString());
             } else {
                 bookPages.add(currentPage);
-                currentPage = new BookPage(null, linesAmount, pageNumber++);
-                currentPage.addTextLine(tempLine.toString() + "|");// + "*" + tempLine.toString().length() + ":" + linesLength); //"**" - only for debug
-                lastTempPage = currentPage;
+                currentPage = new BookPage(null, linesAmount, bookPages.size());
+                currentPage.addTextLine(tempLine.toString());
+                lastPage = currentPage;
             }
-            if (pageNumber >= MAXIMUM_PAGES) break; //now its only for debug
         }
     }
 }

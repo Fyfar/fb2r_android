@@ -29,45 +29,25 @@ public class BookPageView extends Activity {
     private StringBuilder builder;
     private Thread threadForOpenBook;
 
-    /*private boolean isToLargeWidth(TextView text, String newText) {
-        float textWidth = text.getPaint().measureText(newText);
-        return (textWidth >= text.getMeasuredWidth());
-    }
-
-    private boolean isTooLargeHeight(TextView text, String newText) {
-        float textHeight = text.getPaint().measureText(newText);
-        return (textHeight >= text.getMeasuredHeight());
-    }*/
-
-    private int getLineWidth() {
+    private int getNumberOfCharsPerLine() {
         TextView view = (TextView) findViewById(R.id.pageView);
-        /*int width = 0;
-        StringBuilder sb = new StringBuilder();
-        while (!isToLargeWidth(view, sb.append("M.").toString())) {
-            width++;
-        }*/
-        String text = "This is my string dbwebfiu webfywbefy buwebfu ywebnfuie wniu";
+        String text = "This string is using for calculate line width value in text view";
         int textViewWidth = view.getWidth();
-        int numChars;
+        int charCount;
 
         Paint paint = view.getPaint();
-        for (numChars = 1; numChars <= text.length(); ++numChars) {
-            if (paint.measureText(text, 0, numChars) > textViewWidth) {
+        for (charCount = 1; charCount <= text.length(); ++charCount) {
+            if (paint.measureText(text, 0, charCount) > textViewWidth) {
                 break;
             }
         }
-        return numChars - 1;//-1 for testing
+        return charCount;
     }
 
-    private int getLineHeight() {
+    private int getNumberOfLinesPerScreen() {
         TextView view = (TextView) findViewById(R.id.pageView);
-        /*StringBuilder sb = new StringBuilder();
-        int height = 0;
-        while (!isTooLargeHeight(view, sb.append("w\n").toString())) {
-            height++;
-        }*/
         int linesPerScreen = view.getHeight() / (view.getLineHeight() + (int) view.getLineSpacingExtra());
-        return linesPerScreen;//height - height / 3;
+        return linesPerScreen;
     }
 
     @Override
@@ -83,8 +63,8 @@ public class BookPageView extends Activity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                linesPerScreen = getLineHeight();
-                lineLength = getLineWidth();
+                linesPerScreen = getNumberOfLinesPerScreen();
+                lineLength = getNumberOfCharsPerLine();
                 openBook();
                 SeekBar bar = (SeekBar) findViewById(R.id.seekBar);
                 bar.setMax(view.length());
@@ -142,10 +122,10 @@ public class BookPageView extends Activity {
                 for (int i = 0; i < str.length; i++) {
                     builder.append(str[i]);
                 }
-                builder.append("*\n***Page : " + page.getPageNumber() + " ***\n*\n");
+                builder.append("\n***Page : " + page.getPageNumber() + " ***\n\n");
             }
             view.setText(builder.toString());
-            Toast.makeText(this.getApplicationContext(), "Success (parsing) book of " + book.getPages().size() + " pages", Toast.LENGTH_LONG).show();
+            Toast.makeText(this.getApplicationContext(), "Book is loaded. Pages = " + book.getPages().size() + " pages", Toast.LENGTH_LONG).show();
         } catch (Exception ex) {
             Toast.makeText(this.getApplicationContext(), "" + ex.getMessage() + "\n" + ex.getStackTrace().toString(), Toast.LENGTH_LONG).show();
             ex.printStackTrace();

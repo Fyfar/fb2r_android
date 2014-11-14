@@ -13,8 +13,13 @@ public class BookInfo {
     private Collection<String> authors;
     private Collection<String> genre;
     private Collection<String> translator;
-    private Collection<String> publish_info;
-    private Collection<String> custom_info;
+    private Collection<String> publishInfo;
+    private Collection<String> customInfo;
+    private Collection<String> bookTitle;
+    private Collection<String> bookName;
+    private Collection<String> annotation;
+    private Collection<String> bookYear;
+
     private Document document;
 
     public BookInfo(Document document) {
@@ -24,14 +29,22 @@ public class BookInfo {
         authors = new ArrayList<>();
         genre = new ArrayList<>();
         translator = new ArrayList<>();
-        publish_info = new ArrayList<>();
-        custom_info = new ArrayList<>();
+        publishInfo = new ArrayList<>();
+        customInfo = new ArrayList<>();
+        bookTitle = new ArrayList<>();
+        bookName = new ArrayList<>();
+        annotation = new ArrayList<>();
+        bookYear = new ArrayList<>();
         this.document = document;
         setAuthorsInfo();
         setCustomInfo();
         setGenre();
         setPublishInfo();
         setTranslator();
+        setBookTitle();
+        setBookName();
+        setAnnotation();
+        setBookYear();
     }
 
     private void setInfo(String tag, Collection<String> collection) {
@@ -56,11 +69,27 @@ public class BookInfo {
     }
 
     private void setPublishInfo() {
-        setInfo("publish-info", publish_info);
+        setInfo("publish-info", publishInfo);
     }
 
     private void setCustomInfo() {
-        setInfo("custom-info", custom_info);
+        setInfo("custom-info", customInfo);
+    }
+
+    private void setBookTitle() {
+        setInfo("book-title", bookTitle);
+    }
+
+    private void setBookName() {
+        setInfo("book-name", bookName);
+    }
+
+    private void setAnnotation() {
+        setInfo("annotation", annotation);
+    }
+
+    private void setBookYear() {
+        setInfo("year", bookYear);
     }
 
     public Collection<String> getAuthors() {
@@ -76,11 +105,27 @@ public class BookInfo {
     }
 
     public Collection<String> getPublishInfo() {
-        return publish_info;
+        return publishInfo;
     }
 
     public Collection<String> getCustomInfo() {
-        return custom_info;
+        return customInfo;
+    }
+
+    public Collection<String> getBookTitle() {
+        return bookTitle;
+    }
+
+    public Collection<String> getBookName() {
+        return bookName;
+    }
+
+    public Collection<String> getAnnotation() {
+        return annotation;
+    }
+
+    public Collection<String> getBookYear() {
+        return bookYear;
     }
 
 }
