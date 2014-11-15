@@ -1,4 +1,4 @@
-package ua.knure.fb2reader;
+package ua.knure.fb2reader.Views;
 
 import android.app.Activity;
 import android.graphics.Paint;
@@ -21,6 +21,7 @@ import ua.knure.fb2reader.Book.BookPage;
 import ua.knure.fb2reader.Book.Parser;
 import ua.knure.fb2reader.Book.SimpleSyllables;
 import ua.knure.fb2reader.DataAccess.DataAccess;
+import ua.knure.fb2reader.R;
 
 public class BookPageView extends Activity {
 
@@ -53,7 +54,7 @@ public class BookPageView extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book_page);
+        setContentView(R.layout.book_page_view_activity);
         builder = new StringBuilder();
 
         final TextView view = (TextView) findViewById(R.id.pageView);

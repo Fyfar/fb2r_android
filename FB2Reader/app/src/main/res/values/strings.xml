@@ -4,5 +4,10 @@
     <string name="app_name">FB2Reader</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_main_view_pager">MainViewPagerActivity</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_activity_for_get_book_settings">ActivityForGetBookSettings</string>
+    <string name="title_activity_get_book_settings">GetBookSettingsActivity</string>
 
 </resources>
