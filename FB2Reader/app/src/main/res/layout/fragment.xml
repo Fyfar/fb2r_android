@@ -9,8 +9,8 @@
         android:id="@+id/text_view_in_fragment_page"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textSize="22dp"
-        android:gravity="fill|center"
+        android:textSize="16dp"
+        android:gravity="fill_horizontal|top"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:typeface="monospace" />
 </LinearLayout>

@@ -1,7 +1,6 @@
 package ua.knure.fb2reader.Book;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -9,6 +8,8 @@ import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
 import java.util.Collection;
+
+import ua.knure.fb2reader.DataAccess.ImageUtils;
 
 
 /**
@@ -59,8 +60,9 @@ public class Book {
             if (((Element)element.item(i)).getAttribute("id").equals("cover" + format)) {
                 byte[] bin = ((Element)element.item(i)).getTextContent().getBytes();
                 String tmp = ((Element)element.item(i)).getTextContent();
-                Bitmap b;
-                b = BitmapFactory.decodeByteArray(bin, 0, bin.length);
+                Bitmap b = ImageUtils.decodeToImage(bin);
+
+//                b = BitmapFactory.decodeByteArray(bin, 0, bin.length);
                 if (b!=null){
                     Bitmap finalImage = b.copy(Bitmap.Config.ARGB_8888, true);
                     return finalImage;
