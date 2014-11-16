@@ -1,24 +1,25 @@
 package ua.knure.fb2reader.Book;
 
 /**
- * Created by Александр on 15.11.2014.
+ * Created by Александр on 12.11.2014.
  */
 public class SimpleSyllables implements SyllablesPartitionable {
-
     @Override
     public String[] getWordSyllables(String word, int maxLengthOfWord) {
-        StringBuilder chars = new StringBuilder();
-        String[] result = new String[2];
-        for (int i = 0; i < maxLengthOfWord && i < word.length(); i++) {
-            chars.append(word.charAt(i));
+        String tempWord = word;
+        StringBuilder strBuildFirstPart = new StringBuilder();
+        StringBuilder strBuildSecondPart = new StringBuilder();
+        for (int j = 0; j < tempWord.length() / 2; j++) {
+            strBuildFirstPart.append(tempWord.charAt(j));
         }
-        result[0] = chars.toString();
-        chars = new StringBuilder();
-        chars.append('-');
-        for (int i = maxLengthOfWord; i < word.length(); i++) {
-            chars.append(word.charAt(i));
+        for (int j = tempWord.length() / 2; j < tempWord.length(); j++) {
+            strBuildSecondPart.append(tempWord.charAt(j));
         }
-        result[1] = chars.toString();
-        return result;
+        strBuildFirstPart.append("-");
+        String[] wordParts = new String[2];
+        wordParts[0] = strBuildFirstPart.toString();
+        wordParts[1] = strBuildSecondPart.toString();
+        return wordParts;
+
     }
 }

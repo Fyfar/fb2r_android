@@ -1,6 +1,7 @@
 package ua.knure.fb2reader.Views;
 
 import android.app.Activity;
+import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Environment;
@@ -127,6 +128,7 @@ public class BookPageView extends Activity {
             }
             view.setText(builder.toString());
             Toast.makeText(this.getApplicationContext(), "Book is loaded. Pages = " + book.getPages().size() + " pages", Toast.LENGTH_LONG).show();
+            Canvas canvas = new Canvas(book.getBookCover());
         } catch (Exception ex) {
             Toast.makeText(this.getApplicationContext(), "" + ex.getMessage() + "\n" + ex.getStackTrace().toString(), Toast.LENGTH_LONG).show();
             ex.printStackTrace();

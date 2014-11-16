@@ -46,14 +46,13 @@ public class MainFragmentPageView extends FragmentActivity {
         this.document = doc;
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.slide_page_view_activity);
         path = getIntent().getStringExtra("path");
         document = openBookDocument(path);
-        Book book = openBook(document, getIntent().getIntExtra("charsPerLine", 0)-5, getIntent().getIntExtra("linesPerScreen", 0)-5);
+        Book book = openBook(document, getIntent().getIntExtra("charsPerLine", 0), getIntent().getIntExtra("linesPerScreen", 0));
         viewPager = (ViewPager) findViewById(R.id.slide_page_view_pager);
         viewPagerAdapter = new BookPageFragmentPagerAdapter(getSupportFragmentManager(), (List<BookPage>) book.getPages());
         viewPager.setAdapter(viewPagerAdapter);
@@ -126,8 +125,6 @@ public class MainFragmentPageView extends FragmentActivity {
         //"/.fb2reader/sample.xml");//sample.xml //samplqe.xml //metro.fb2
         try {
             org.w3c.dom.Document doc = Parser.getParsedBook(currentBook);
-            //Book book = new Book(doc, lineLength, linesPerScreen, 0, new SimpleSyllables());
-            //Toast.makeText(this.getApplicationContext(), "Book is loaded. Pages = " + book.getPages().size() + " pages", Toast.LENGTH_LONG).show();
             return doc;
         } catch (Exception ex) {
             Toast.makeText(this.getApplicationContext(), "" + ex.getMessage() + "\n" + ex.getStackTrace().toString(), Toast.LENGTH_LONG).show();

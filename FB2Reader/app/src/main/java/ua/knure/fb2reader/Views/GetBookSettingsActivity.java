@@ -3,7 +3,6 @@ package ua.knure.fb2reader.Views;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -14,17 +13,12 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.File;
-
-import ua.knure.fb2reader.Book.Parser;
-import ua.knure.fb2reader.DataAccess.DataAccess;
 import ua.knure.fb2reader.R;
 
 public class GetBookSettingsActivity extends FragmentActivity {
 
-    static final int PAGE_COUNT = 2;
+    static final int PAGE_COUNT = 1;
     static int charsPerLine;
     static int linesPerScreen;
 
@@ -70,10 +64,15 @@ public class GetBookSettingsActivity extends FragmentActivity {
                 charsPerLine = getNumberOfCharsPerLine(view);
 
                 Intent intent = new Intent(GetBookSettingsActivity.this, MainFragmentPageView.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 intent.putExtra("charsPerLine", charsPerLine);
                 intent.putExtra("linesPerScreen", linesPerScreen);
                 intent.putExtra("path","/.fb2reader/sample.xml");
                 startActivity(intent);
+                finish();
+                System.exit(0);
             }
         }, 2000);
     }
