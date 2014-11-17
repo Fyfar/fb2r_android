@@ -1,6 +1,9 @@
 package ua.knure.fb2reader.Views;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -64,21 +67,30 @@ public class GetBookSettingsActivity extends FragmentActivity {
         viewPager = (ViewPager) findViewById(R.id.slide_page_view_pager);
         viewPagerAdapter = new BookPageFragmentPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);
-
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 TextView view = (TextView) findViewById(R.id.text_view_in_fragment_page);
-
                 linesPerScreen = getNumberOfLinesPerScreen(view);
                 charsPerLine = getNumberOfCharsPerLine(view);
-
                 //"/.fb2reader/sample.xml");//sample.xml //samplqe.xml //metro.fb2
                 Book book = openBook(openBookDocument("/.fb2reader/sample.xml"), charsPerLine, linesPerScreen);
-
                 viewPagerAdapter = new BookPageFragmentPagerAdapter(getSupportFragmentManager(), book);
                 viewPagerAdapter.notifyDataSetChanged();
                 viewPager.setAdapter(viewPagerAdapter);
+                AlertDialog.Builder builder = new AlertDialog.Builder(GetBookSettingsActivity.this);
+                BitmapDrawable bmDr = new BitmapDrawable(getResources(), book.getBookCover());
+                builder.setIcon(bmDr);
+                builder.setTitle(" ");
+                builder.setMessage(book.getBookInfo().getBookTitle() + "\n");
+                builder.setCancelable(false);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
             }
         }, 1000);
     }

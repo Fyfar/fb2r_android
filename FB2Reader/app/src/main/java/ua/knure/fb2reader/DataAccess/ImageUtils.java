@@ -9,16 +9,11 @@ import android.util.Base64;
  */
 public class ImageUtils {
 
-    public static Bitmap decodeToImage(byte[] imageString) {
-
+    public static Bitmap decodeToImage(String imageString) {
         Bitmap image = null;
-
         try {
-            byte[] img = Base64.decode(imageString, 0, imageString.length, Base64.DEFAULT);
+            byte[] img = Base64.decode(imageString, Base64.DEFAULT);
             image = BitmapFactory.decodeByteArray(img, 0, img.length);
-            //ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
-            //image = ImageIO.read(bis);
-            //bis.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

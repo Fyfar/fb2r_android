@@ -37,15 +37,17 @@ public class Book {
         info = new BookInfo(book);
         pages = new ArrayList<>();
         createPages();
-        //cover = getImageFromBook();
+        cover = getImageFromBook();
     }
 
     private Bitmap getImageFromBook() {
         NodeList element = book.getElementsByTagName("binary");
         int count = element.getLength();
-        for (int i = 0; i< count; i++) {
+        Bitmap finalImage;
+        Bitmap b;
+        for (int i = 0; i < count; i++) {
             String format = "";
-            format = ((Element)element.item(i)).getAttribute("content-type");
+            format = ((Element) element.item(i)).getAttribute("content-type");
             switch (format) {
                 case "image/jpeg":
                     format = ".jpg";
@@ -57,14 +59,11 @@ public class Book {
                     format = "";
                     break;
             }
-            if (((Element)element.item(i)).getAttribute("id").equals("cover" + format)) {
-                byte[] bin = ((Element)element.item(i)).getTextContent().getBytes();
-                String tmp = ((Element)element.item(i)).getTextContent();
-                Bitmap b = ImageUtils.decodeToImage(bin);
-
-//                b = BitmapFactory.decodeByteArray(bin, 0, bin.length);
-                if (b!=null){
-                    Bitmap finalImage = b.copy(Bitmap.Config.ARGB_8888, true);
+            if (((Element) element.item(i)).getAttribute("id").equals("cover" + format)) {
+                String tmp = ((Element) element.item(i)).getTextContent();
+                b = ImageUtils.decodeToImage(tmp);
+                if (b != null) {
+                    finalImage = b.copy(Bitmap.Config.ARGB_8888, true);
                     return finalImage;
                 }
             }
