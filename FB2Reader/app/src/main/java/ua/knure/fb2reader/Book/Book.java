@@ -88,4 +88,7 @@ public class Book {
         return cover;
     }
 
+    public void setNumberOfLastPage(int numberOfLastPage) {
+        this.numberOfLastPage = numberOfLastPage;
+    }
 }
