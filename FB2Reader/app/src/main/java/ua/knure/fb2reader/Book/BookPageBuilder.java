@@ -70,7 +70,15 @@ public class BookPageBuilder {
             Collection<String> titleText = new ArrayList<>();
             for (int i = 0; i < title.length; i++) {
                 if (title[i] != null && title[i].length() > 0) {
-                    titleText.add(title[i]);
+                    String currentTitleString = title[i];
+                    if (currentTitleString.length() < linesLength){
+                        StringBuilder sb = new StringBuilder();
+                        for (int k=0; k<(linesLength-currentTitleString.length())/2; k++){
+                            sb.append(" ");
+                        }
+                        currentTitleString = sb.toString() + currentTitleString;
+                    }
+                    titleText.add(currentTitleString);
                 }
             }
             Iterator<String> titleTextIterator = titleText.iterator();
@@ -111,9 +119,13 @@ public class BookPageBuilder {
 
         StringBuilder tempLine;
         Queue<String> queueOfWords = new LinkedList<>();
-
+        boolean firstWord = true;
         for (int i = 0; i < textInCurrentParagraph.length; i++) {
             String tempWord = textInCurrentParagraph[i];
+            if (firstWord){
+                tempWord = "   " + tempWord;
+                firstWord = false;
+            }
             if (tempWord.length() + WHITE_SPACE >= linesLength) {
                 String[] wordSyllables = syllables.getWordSyllables(tempWord, linesLength);
                 for (int j = 0; j < wordSyllables.length; j++) {

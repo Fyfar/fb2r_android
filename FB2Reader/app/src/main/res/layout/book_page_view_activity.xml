@@ -6,7 +6,6 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:textSize="22sp"
-        android:autoText="false"
         android:scrollbars="vertical"
         android:id="@+id/pageView"
         android:typeface="monospace" />
