@@ -40,7 +40,7 @@ public class Book {
         cover = getImageFromBook();
     }
 
-    private Bitmap getImageFromBook() {
+    public static Bitmap getCoverForBook(Document book) {
         NodeList element = book.getElementsByTagName("binary");
         int count = element.getLength();
         Bitmap finalImage;
@@ -71,6 +71,10 @@ public class Book {
         return null;
     }
 
+    private Bitmap getImageFromBook() {
+        return getCoverForBook(book);
+    }
+
     private void createPages() {
         BookPageBuilder builder = new BookPageBuilder(book, charactersPerLine, linesPerPage, syllables);
         pages = builder.buildPages();
@@ -88,7 +92,4 @@ public class Book {
         return cover;
     }
 
-    public void setNumberOfLastPage(int numberOfLastPage) {
-        this.numberOfLastPage = numberOfLastPage;
-    }
 }
