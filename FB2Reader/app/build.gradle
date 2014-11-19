@@ -40,6 +40,5 @@ tasks.withType(Compile) {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:support-v4:21.0.0'
-    compile files('libs/dropbox-sync-sdk-android.jar')
-    compile files("$buildDir/native-libs/native-libs.jar")
+    apk files('libs/dropbox-sync-sdk-android.jar')
 }

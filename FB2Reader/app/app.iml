@@ -84,7 +84,6 @@
     <orderEntry type="library" exported="" name="support-annotations-21.0.0" level="project" />
     <orderEntry type="library" exported="" name="lib" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.0" level="project" />
-    <orderEntry type="library" exported="" name="native-libs" level="project" />
     <orderEntry type="library" exported="" name="dropbox-sync-sdk-android" level="project" />
   </component>
 </module>
