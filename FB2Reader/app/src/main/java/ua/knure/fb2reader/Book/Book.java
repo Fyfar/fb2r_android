@@ -32,7 +32,7 @@ public class Book {
         if (numberOfLastPage >= 0) {
             this.numberOfLastPage = numberOfLastPage;
         }
-        cover = getImageFromBook();
+        //cover = getImageFromBook();
         info = new BookInfo(book);
         pages = new ArrayList<>();
         createPages();
