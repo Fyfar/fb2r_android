@@ -71,9 +71,9 @@ public class BookPageBuilder {
             for (int i = 0; i < title.length; i++) {
                 if (title[i] != null && title[i].length() > 0) {
                     String currentTitleString = title[i];
-                    if (currentTitleString.length() < linesLength){
+                    if (currentTitleString.length() < linesLength) {
                         StringBuilder sb = new StringBuilder();
-                        for (int k=0; k<(linesLength-currentTitleString.length())/2; k++){
+                        for (int k = 0; k < (linesLength - currentTitleString.length()) / 2; k++) {
                             sb.append(" ");
                         }
                         currentTitleString = sb.toString() + currentTitleString;
@@ -122,7 +122,7 @@ public class BookPageBuilder {
         boolean firstWord = true;
         for (int i = 0; i < textInCurrentParagraph.length; i++) {
             String tempWord = textInCurrentParagraph[i];
-            if (firstWord){
+            if (firstWord) {
                 tempWord = "   " + tempWord;
                 firstWord = false;
             }
@@ -160,11 +160,12 @@ public class BookPageBuilder {
             return str;
         }
         while (builder.length() != linesLength - 1) {
-            if (i < 1) {
-                i = str.length() - 1;
-            }
             if (i < str.length()) {
                 i = builder.lastIndexOf(" ", i);
+                if (i < 2) {
+                    i = str.length() - 1;
+                    i = builder.lastIndexOf(" ", i);
+                }
                 builder.insert(i--, " ");
             }
         }
