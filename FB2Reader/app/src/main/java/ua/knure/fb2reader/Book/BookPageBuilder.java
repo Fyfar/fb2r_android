@@ -29,7 +29,7 @@ public class BookPageBuilder {
         this.book = book;
         bookPages = new ArrayList<>();
         linesAmount = linesPerPage;
-        linesLength = charactersPerLine;
+        linesLength = charactersPerLine - 1;
         pageNumber = 1;
         this.syllables = syllables;
     }
@@ -135,19 +135,39 @@ public class BookPageBuilder {
                 queueOfWords.add(tempWord);
             }
         }
+
         while (!queueOfWords.isEmpty()) {
             tempLine = new StringBuilder();
             while (queueOfWords.peek() != null && tempLine.length() + queueOfWords.peek().length() + 1 < linesLength) {
                 tempLine.append(" " + queueOfWords.poll());
             }
             if (currentPage.isNotFull()) {
-                currentPage.addTextLine(tempLine.toString());
+                currentPage.addTextLine(align(tempLine.toString()));
             } else {
                 bookPages.add(currentPage);
                 currentPage = new BookPage(null, linesAmount, bookPages.size());
-                currentPage.addTextLine(tempLine.toString());
+                currentPage.addTextLine(align(tempLine.toString()));
                 lastPage = currentPage;
             }
         }
+    }
+
+    private String align(String str) {
+        StringBuilder builder = new StringBuilder();
+        int i = str.length() - 1;
+        builder.append(str);
+        if (linesLength - str.length() > linesLength / 4) {
+            return str;
+        }
+        while (builder.length() != linesLength - 1) {
+            if (i < 1) {
+                i = str.length() - 1;
+            }
+            if (i < str.length()) {
+                i = builder.lastIndexOf(" ", i);
+                builder.insert(i--, " ");
+            }
+        }
+        return builder.toString();
     }
 }
