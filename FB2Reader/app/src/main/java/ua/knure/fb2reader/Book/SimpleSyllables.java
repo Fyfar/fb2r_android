@@ -2,7 +2,6 @@ package ua.knure.fb2reader.Book;
 
 /**
  * Created by Александр on 12.11.2014.
- *
  */
 public class SimpleSyllables implements SyllablesPartitionable {
 
