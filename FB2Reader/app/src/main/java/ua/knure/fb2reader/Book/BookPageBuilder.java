@@ -73,7 +73,9 @@ public class BookPageBuilder {
                     String currentTitleString = title[i];
                     if (currentTitleString.length() < linesLength) {
                         StringBuilder sb = new StringBuilder();
-                        for (int k = 0; k < (linesLength - currentTitleString.length()) / 2; k++) {
+                        int center = currentTitleString.length() % 2 == 0 ?
+                                (linesLength - currentTitleString.length()) / 3 : (linesLength - currentTitleString.length()) / 2;
+                        for (int k = 0; k < center; k++) {
                             sb.append(" ");
                         }
                         currentTitleString = sb.toString() + currentTitleString;
@@ -91,7 +93,15 @@ public class BookPageBuilder {
             int numbersOfParagraphsInTitle = ((Element) p.item(0)).getElementsByTagName("p").getLength();
             buildPageByParagraphs(current.getElementsByTagName("p"), numbersOfParagraphsInTitle);
         } else {
-            page = new BookPage("***", linesAmount, bookPages.size());
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < linesLength / 2 - 3; i++) {
+                builder.append(" ");
+            }
+            builder.append("***");
+            for (int i = builder.length(); i < linesLength; i++) {
+                builder.append(" ");
+            }
+            page = new BookPage(builder.toString(), linesAmount, bookPages.size());
             page.addTextLine(" ");
             lastPage = page;
             int numbersOfParagraphsInTitle = 0;
@@ -162,7 +172,7 @@ public class BookPageBuilder {
         while (builder.length() != linesLength - 1) {
             if (i < str.length()) {
                 i = builder.lastIndexOf(" ", i);
-                if (i < 2) {
+                if (i < 8) {
                     i = str.length() - 1;
                     i = builder.lastIndexOf(" ", i);
                 }
