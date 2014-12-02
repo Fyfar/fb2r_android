@@ -6,6 +6,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -15,15 +16,22 @@ import ua.knure.fb2reader.DataAccess.ImageUtils;
 /**
  * Created by Александр on 28.10.2014.
  */
-public class Book {
+
+/*
+* Книга. Описывать смысла нету. Все что скажу, это то что для того что бы ее возможно было
+* передавать в Bundle, пришлось добавить сериализацию (кроме implements Serializable слава Богу
+* ничего больше не понадобилось =) )
+* */
+public class Book implements Serializable {
     private Document book;
     private BookInfo info;
     private Collection<BookPage> pages;
-    private int numberOfLastPage;
+    private int numberOfLastPage; /* пока что нигде не используется потому что не реализовано сохранение прогресса*/
     private int charactersPerLine;
     private int linesPerPage;
     private SyllablesPartitionable syllables;
     private Bitmap cover;
+    private String fullPath;
 
     public Book(Document book, int charactersPerLine, int linesPerPage, int numberOfLastPage, SyllablesPartitionable syllables) {//Parsed document(book)
         this.book = book;
@@ -40,7 +48,7 @@ public class Book {
         cover = getImageFromBook();
     }
 
-    public static Bitmap getCoverForBook(Document book) {
+    private Bitmap getImageFromBook() {
         NodeList element = book.getElementsByTagName("binary");
         int count = element.getLength();
         Bitmap finalImage;
@@ -71,10 +79,6 @@ public class Book {
         return null;
     }
 
-    private Bitmap getImageFromBook() {
-        return getCoverForBook(book);
-    }
-
     private void createPages() {
         BookPageBuilder builder = new BookPageBuilder(book, charactersPerLine, linesPerPage, syllables);
         pages = builder.buildPages();
@@ -90,6 +94,24 @@ public class Book {
 
     public Bitmap getBookCover() {
         return cover;
+    }
+
+    public int getCharsPerLine() {
+        return charactersPerLine;
+    }
+
+    public void setLastPageNumber(int number) {
+        if (number > 0 && number < pages.size()) {
+            numberOfLastPage = number;
+        }
+    }
+
+    public void setFullPath(String fullPath) {
+        this.fullPath = fullPath;
+    }
+
+    public String getFullPath() {
+        return fullPath;
     }
 
 }
