@@ -9,6 +9,10 @@ import android.util.Base64;
  */
 public class ImageUtils {
 
+    /*
+    * Метод нужен для декодинга картинки из закодированной строчки в
+    * формате Base64 в обычный битмап
+    * */
     public static Bitmap decodeToImage(String imageString) {
         Bitmap image = null;
         try {
