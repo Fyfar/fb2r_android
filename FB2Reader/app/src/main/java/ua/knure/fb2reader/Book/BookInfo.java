@@ -5,20 +5,21 @@ import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by Александр on 28.10.2014.
  */
 public class BookInfo {
-    private Collection<String> authors;
-    private Collection<String> genre;
-    private Collection<String> translator;
-    private Collection<String> publishInfo;
-    private Collection<String> customInfo;
-    private Collection<String> bookTitle;
-    private Collection<String> bookName;
-    private Collection<String> annotation;
-    private Collection<String> bookYear;
+    private List<String> authors;
+    private List<String> genre;
+    private List<String> translator;
+    private List<String> publishInfo;
+    private List<String> customInfo;
+    private List<String> bookTitle;
+    private List<String> bookName;
+    private List<String> annotation;
+    private List<String> bookYear;
 
     private Document document;
 
@@ -92,39 +93,39 @@ public class BookInfo {
         setInfo("year", bookYear);
     }
 
-    public Collection<String> getAuthors() {
+    public List<String> getAuthors() {
         return authors;
     }
 
-    public Collection<String> getGenre() {
+    public List<String> getGenre() {
         return genre;
     }
 
-    public Collection<String> getTranslator() {
+    public List<String> getTranslator() {
         return translator;
     }
 
-    public Collection<String> getPublishInfo() {
+    public List<String> getPublishInfo() {
         return publishInfo;
     }
 
-    public Collection<String> getCustomInfo() {
+    public List<String> getCustomInfo() {
         return customInfo;
     }
 
-    public Collection<String> getBookTitle() {
+    public List<String> getBookTitle() {
         return bookTitle;
     }
 
-    public Collection<String> getBookName() {
+    public List<String> getBookName() {
         return bookName;
     }
 
-    public Collection<String> getAnnotation() {
+    public List<String> getAnnotation() {
         return annotation;
     }
 
-    public Collection<String> getBookYear() {
+    public List<String> getBookYear() {
         return bookYear;
     }
 
