@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+    }
     compileSdkVersion 16
     buildToolsVersion "20.0.0"
     defaultConfig {
@@ -12,7 +14,7 @@ android {
     }
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -24,8 +26,17 @@ android {
     }
 }
 
+android {
+    tasks.withType(com.android.build.gradle.tasks.PackageApplication) {
+        pkgTask -> pkgTask.jniFolders = new HashSet<File>();
+            pkgTask.jniFolders.add(new File(projectDir, 'libs'));
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:support-v4:21.0.2'
+    compile 'com.android.support:support-v4:21.0.0'
     compile "com.android.support:appcompat-v7:19.0.+"
+    compile files('jniLibs/dropbox-sync-sdk-android.jar')
+    compile files("$buildDir/native-libs/native-libs.jar")
 }
