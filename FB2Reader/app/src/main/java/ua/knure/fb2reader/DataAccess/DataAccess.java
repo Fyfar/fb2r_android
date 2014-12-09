@@ -16,23 +16,14 @@ import ua.knure.fb2reader.Book.SimpleSyllables;
 public class DataAccess {
     public static File STANDART_BOOK_FOLDER_DIRECTORY = new File(Environment.getExternalStorageDirectory() + "/CloudReader");
     public static File STANDART_BOOK_SETTINGS_FOLDER_DIRECTORY = new File(Environment.getExternalStorageDirectory() + "/CloudReader/.settings");
-
     private static List<File> bookList;
 
     public static File openBook(String path) {
-        if (path.equals("") || path == null || path.length() < 1) {
+        if (path == null || path.equals("") || path.length() < 1) {
             throw new IllegalArgumentException("Path is not correct");
         }
         File file = new File(path);
         return file;
-    }
-
-    /*
-    * В этом методе нужно будет реализовать сохранения данных для синхронизации
-    * */
-    public static void saveSynchronizedData(Object data) {
-        //To Do
-        throw new RuntimeException("");
     }
 
     /*
@@ -56,7 +47,7 @@ public class DataAccess {
     /*
     * Метод который открывает книжку и возвращает уже отпарсенный вариант документа
     * **/
-    public static org.w3c.dom.Document openBookDocument(String path) {
+    public static org.w3c.dom.Document openBookDocumentFromFile(String path) {
         File currentBook = DataAccess.openBook(path);
         org.w3c.dom.Document doc = null;
         try {
@@ -72,7 +63,7 @@ public class DataAccess {
     * Метод который из отпарсенного документа создает книжку с нужными настройками
     * строк и символов
     * **/
-    public static Book openBook(org.w3c.dom.Document doc, int lineLength, int linesPerScreen) {
+    public static Book openBookFromDocument(org.w3c.dom.Document doc, int lineLength, int linesPerScreen) {
         Book book = null;
         try {
             book = new Book(doc, lineLength, linesPerScreen, 0, new SimpleSyllables());

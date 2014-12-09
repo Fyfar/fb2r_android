@@ -25,11 +25,11 @@ import ua.knure.fb2reader.Views.Params;
 * описана логика создания страниц самой книги в TextView
 * */
 public class ViewPageFragment extends Fragment {
-    static List<String> BOOK_PAGES;
-    static int PAGE_NUMBER;
-    static int TEXT_SIZE;
-    static int TEXT_COLOR;
-    static int BACKGROUND_COLOR;
+    private List<String> bookPages;
+    private int pageNumber;
+    private int textSize;
+    private int textColor;
+    private int backgroundColor;
 
     public ViewPageFragment() {
         super();
@@ -38,31 +38,31 @@ public class ViewPageFragment extends Fragment {
     public static ViewPageFragment newInstance(int page) {
         ViewPageFragment viewPageFragment = new ViewPageFragment();
         Bundle arguments = new Bundle();
-        arguments.putInt(Params.ARGUMENT_PAGE_NUMBER, page);
+        arguments.putInt(Params.ARG_PAGE_NUMBER, page);
         viewPageFragment.setArguments(arguments);
         return viewPageFragment;
     }
 
     public static Fragment newInstance(int position, Book book) {
         ViewPageFragment viewPageFragment = new ViewPageFragment();
-        List<BookPage> pages = (List<BookPage>) book.getPages();
+        List<BookPage> pages = book.getBookPages();
         Bundle arguments = new Bundle();
-        arguments.putInt(Params.ARGUMENT_PAGE_NUMBER, position);
-        arguments.putStringArrayList(Params.ARGUMENT_PAGE_TEXT, (ArrayList<String>) pages.get(position).getLines());
-        arguments.putInt(Params.ARGUMENT_TEXT_SIZE, book.getCharsPerLine());
+        arguments.putInt(Params.ARG_PAGE_NUMBER, position);
+        arguments.putStringArrayList(Params.ARG_PAGE_TEXT, (ArrayList<String>) pages.get(position).getLinesOnThePage());
+        arguments.putInt(Params.ARG_TEXT_SIZE, book.getCharsPerLine());
         viewPageFragment.setArguments(arguments);
         return viewPageFragment;
     }
 
     public static Fragment newInstance(int position, Book book, int textSize, int textColor, int backgroundColor) {
         ViewPageFragment viewPageFragment = new ViewPageFragment();
-        List<BookPage> pages = (List<BookPage>) book.getPages();
+        List<BookPage> pages = book.getBookPages();
         Bundle arguments = new Bundle();
-        arguments.putInt(Params.ARGUMENT_PAGE_NUMBER, position);
-        arguments.putStringArrayList(Params.ARGUMENT_PAGE_TEXT, (ArrayList<String>) pages.get(position).getLines());
-        arguments.putInt(Params.ARGUMENT_TEXT_SIZE, textSize);
-        arguments.putInt(Params.ARGUMENT_TEXT_COLOR, textColor);
-        arguments.putInt(Params.ARGUMENT_BACKGROUND_COLOR, backgroundColor);
+        arguments.putInt(Params.ARG_PAGE_NUMBER, position);
+        arguments.putStringArrayList(Params.ARG_PAGE_TEXT, (ArrayList<String>) pages.get(position).getLinesOnThePage());
+        arguments.putInt(Params.ARG_TEXT_SIZE, textSize);
+        arguments.putInt(Params.ARG_TEXT_COLOR, textColor);
+        arguments.putInt(Params.ARG_BACKGROUND_COLOR, backgroundColor);
         viewPageFragment.setArguments(arguments);
         return viewPageFragment;
     }
@@ -70,67 +70,36 @@ public class ViewPageFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        PAGE_NUMBER = getArguments().getInt(Params.ARGUMENT_PAGE_NUMBER);
-        BOOK_PAGES = getArguments().getStringArrayList(Params.ARGUMENT_PAGE_TEXT);
-        TEXT_COLOR = getArguments().getInt(Params.ARGUMENT_TEXT_COLOR);
-        BACKGROUND_COLOR = getArguments().getInt(Params.ARGUMENT_BACKGROUND_COLOR);
-        TEXT_SIZE = getArguments().getInt(Params.ARGUMENT_TEXT_SIZE);
+        pageNumber = getArguments().getInt(Params.ARG_PAGE_NUMBER);
+        bookPages = getArguments().getStringArrayList(Params.ARG_PAGE_TEXT);
+        textColor = getArguments().getInt(Params.ARG_TEXT_COLOR);
+        backgroundColor = getArguments().getInt(Params.ARG_BACKGROUND_COLOR);
+        textSize = getArguments().getInt(Params.ARG_TEXT_SIZE);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        PAGE_NUMBER = getArguments().getInt(Params.ARGUMENT_PAGE_NUMBER);
-        BOOK_PAGES = getArguments().getStringArrayList(Params.ARGUMENT_PAGE_TEXT);
-        TEXT_COLOR = getArguments().getInt(Params.ARGUMENT_TEXT_COLOR);
-        BACKGROUND_COLOR = getArguments().getInt(Params.ARGUMENT_BACKGROUND_COLOR);
-        TEXT_SIZE = getArguments().getInt(Params.ARGUMENT_TEXT_SIZE);
-
-
         View view = inflater.inflate(R.layout.view_page_fragment, null);
         TextView textView = (TextView) view.findViewById(R.id.text_view_fragment);
 
-        //this operations like lower that will be need to add some properties to textview like text size, color, etc...
-        //textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25);
         StringBuilder builder = new StringBuilder();
-
-
-        if (BOOK_PAGES != null && BOOK_PAGES.size() > 0) {
+        if (bookPages != null && bookPages.size() > 0) {
             textView.setBackgroundColor(Color.WHITE);
             textView.setTextColor(Color.BLACK);
-            Iterator<String> iterator = BOOK_PAGES.iterator();
-
+            Iterator<String> iterator = bookPages.iterator();
             while (iterator.hasNext()) {
-                //textView.append(iterator.next().toString());
                 builder.append(iterator.next().toString());
             }
             textView.setText(builder.toString());
-            //textView.setText(builder.toString(), true);
-            //textView.setHyphenate(true, " ");
             return view;
         }
         textView.setBackgroundColor(Color.BLACK);
         textView.setTextColor(Color.BLACK);
-        textView.setText("...  Please   wait,   book   loading   all   pages   data  ..." +
-                "...  Please   wait,   book   loading   all   pages   data  ..." +
-                "...  Please   wait,   book   loading   all   pages   data  ..." +
-                "...  Please   wait,   book   loading   all   pages   data  ..." +
-                "...  Please   wait,   book   loading   all   pages   data  ..." +
-                "...  Please   wait,   book   loading   all   pages   data  ..." +
-                "...  Please   wait,   book   loading   all   pages   data  ..." +
-                "...  Please   wait,   book   loading   all   pages   data  ..." +
-                "...  Please   wait,   book   loading   all   pages   data  ..." +
-                "...  Please   wait,   book   loading   all   pages   data  ..." +
-                "...  Please   wait,   book   loading   all   pages   data  ..." +
-                "...  Please   wait,   book   loading   all   pages   data  ..." +
-                "...  Please   wait,   book   loading   all   pages   data  ..." +
-                "...  Please   wait,   book   loading   all   pages   data  ...");
-        /*
-        * Этот длинный текст нужен для того что бы заполнить от левого до правого края текствью
-        * что бы правильно посчитать максимальное число символов в строке.
-        * Текст длинный для того что бы перестраховаться и на разных экранах он заполнил
-        * всю строку
-        * */
+        int NumberOfCharsInPage = 2000;
+        for (int i = 0; i < NumberOfCharsInPage; i++){
+            textView.append("W");
+        }
         return view;
     }
 }

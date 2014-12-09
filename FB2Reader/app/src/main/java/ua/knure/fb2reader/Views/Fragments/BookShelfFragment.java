@@ -22,9 +22,9 @@ import ua.knure.fb2reader.Views.Params;
 * */
 public class BookShelfFragment extends Fragment {
 
-    private ArrayAdapter adapter;
-    private List<String> fileNames;/* Здесь будут хранится имена файлов для отображения*/
-    private List<String> filePathes;/* Здесь будут хранится полные пути соответствующие именам файлов*/
+    private ArrayAdapter arrayAdapter;
+    private List<String> fileNamesList;/* Здесь будут хранится имена файлов для отображения*/
+    private List<String> filePathesList;/* Здесь будут хранится полные пути соответствующие именам файлов*/
     private OnBookSelectedListener onBookSelectedListener;
 
     /*
@@ -37,19 +37,21 @@ public class BookShelfFragment extends Fragment {
     /* Метод-фабрика который будет создавать фрагмент
      * */
     public static BookShelfFragment newInstance() {
-        ArrayList<String> mfiles = new ArrayList<>();
-        ArrayList<String> mpathes = new ArrayList<>();
-        mfiles.clear();
-        mpathes.clear();
+        ArrayList<String> files = new ArrayList<>();
+        ArrayList<String> pathes = new ArrayList<>();
+        files.clear();
+        pathes.clear();
+
         for (File file : DataAccess.getAllFilesInBooksFolder(DataAccess.STANDART_BOOK_FOLDER_DIRECTORY)) {
-            mfiles.add(file.getName().substring(0, file.getName().lastIndexOf('.')));
-            mpathes.add(file.getAbsolutePath());
+            files.add(file.getName().substring(0, file.getName().lastIndexOf('.')));
+            pathes.add(file.getAbsolutePath());
         }
+
         BookShelfFragment fragment = new BookShelfFragment();
-        Bundle args = new Bundle();
-        args.putStringArrayList(Params.ARGUMENT_ALL_NAMES_OF_BOOKS, mfiles);
-        args.putStringArrayList(Params.ARGUMENT_ALL_PATHES_TO_BOOKS, mpathes);
-        fragment.setArguments(args);
+        Bundle arguments = new Bundle();
+        arguments.putStringArrayList(Params.ARG_ALL_NAMES_OF_BOOKS, files);
+        arguments.putStringArrayList(Params.ARG_ALL_PATHES_TO_BOOKS, pathes);
+        fragment.setArguments(arguments);
         return fragment;
     }
 
@@ -62,20 +64,21 @@ public class BookShelfFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         ListView listView = (ListView) view.findViewById(R.id.book_listView);
-        Bundle args = getArguments();
-        fileNames = args.getStringArrayList(Params.ARGUMENT_ALL_NAMES_OF_BOOKS);
-        filePathes = args.getStringArrayList(Params.ARGUMENT_ALL_PATHES_TO_BOOKS);
-        adapter = new ArrayAdapter<>(getView().getContext(), R.layout.book_list_layout, fileNames);
-        listView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+        Bundle arguments = getArguments();
+        fileNamesList = arguments.getStringArrayList(Params.ARG_ALL_NAMES_OF_BOOKS);
+        filePathesList = arguments.getStringArrayList(Params.ARG_ALL_PATHES_TO_BOOKS);
+
+        arrayAdapter = new ArrayAdapter<>(getView().getContext(), R.layout.book_list_layout, fileNamesList);
+        listView.setAdapter(arrayAdapter);
+        arrayAdapter.notifyDataSetChanged();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String item = filePathes.get((int) id);
+                String item = filePathesList.get((int) id);
                 onBookSelectedListener.OnBookSelectedEvent(item);
             }
         });
-        getActivity().getActionBar().setTitle(Params.MENU_TITLES[Params.MENU_ID_BOOK_SHELF]);
+        getActivity().getActionBar().setTitle(Params.MENU_TITLES[Params.MENU_BOOK_SHELF]);
     }
 
     /*

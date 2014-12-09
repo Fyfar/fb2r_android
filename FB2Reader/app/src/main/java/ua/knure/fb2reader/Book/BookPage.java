@@ -1,20 +1,20 @@
 package ua.knure.fb2reader.Book;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by Александр on 28.10.2014.
  */
 public class BookPage {
-    private Collection<String> lines;
-    private int amountOfLines;
-    private int pageNumber;
+    private List<String> linesOnThePage;
+    private int numberOfLines;
+    private int numberOfThePage;
 
-    public BookPage(String title, int amountOfLines, int pageNumber) {
-        this.amountOfLines = amountOfLines;
-        lines = new ArrayList<>();
-        this.pageNumber = pageNumber;
+    public BookPage(String title, int numberOfLines, int numberOfThePage) {
+        this.numberOfLines = numberOfLines;
+        this.numberOfThePage = numberOfThePage;
+        linesOnThePage = new ArrayList<>();
         if (title != null && title != "") {
             addTextLine(title);
         }
@@ -22,21 +22,21 @@ public class BookPage {
 
     public void addTextLine(String line) {
         if (isNotFull()) {
-            lines.add(line + "\n");
+            linesOnThePage.add(line + "\n");
         } else {
             throw new RuntimeException("Page is full");
         }
     }
 
     public boolean isNotFull() {
-        return lines.size() < amountOfLines;
+        return linesOnThePage.size() < numberOfLines;
     }
 
-    public Collection<String> getLines() {
-        return lines;
+    public List<String> getLinesOnThePage() {
+        return linesOnThePage;
     }
 
-    public int getPageNumber() {
-        return pageNumber;
+    public int getNumberOfThePage() {
+        return numberOfThePage;
     }
 }

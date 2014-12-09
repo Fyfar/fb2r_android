@@ -87,12 +87,11 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         // Initialize the first fragment when the application first loads.
         if (savedInstanceState == null) {
             if (isLogined) {
-                selectItem(Params.MENU_ID_BOOK_SHELF);
+                selectItem(Params.MENU_BOOK_SHELF);
             } else {
-                selectItem(Params.MENU_ID_APP_LOGIN);
+                selectItem(Params.MENU_APP_LOGIN);
             }
         }
-
     }
 
     @Override
@@ -135,43 +134,41 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
      */
     private void selectItem(int position) {
         // Update the main content by replacing fragments
-        Bundle bundle = new Bundle();
+        Bundle arguments = new Bundle();
         Fragment fragment = null;
+
         switch (position) {
-            case Params.MENU_ID_BOOK_SHELF:
+            case Params.MENU_BOOK_SHELF:
                 fragment = BookShelfFragment.newInstance();
-                bundle = fragment.getArguments();
+                arguments = fragment.getArguments();
                 break;
-            case Params.MENU_ID_BOOK_INFO:
+            case Params.MENU_BOOK_INFO:
                 if (lastOpenedBook != null) {
                     fragment = BookInfoFragment.newInstance(lastOpenedBook);
-                    bundle = fragment.getArguments();
+                    arguments = fragment.getArguments();
                 } else {
                     Toast.makeText(getApplicationContext(), "OPEN BOOK BEFORE", Toast.LENGTH_LONG);
                 }
                 break;
-            case Params.MENU_ID_BOOK_ADD_BOOKMARK:
+            case Params.MENU_BOOK_ADD_BOOKMARK:
                 //fragment = AddBookmarkFragment.newInstance("","");
-                FragmentManager manager = getSupportFragmentManager();
+                break;
+            case Params.MENU_BOOK_SEARCH:
 
                 break;
-            case Params.MENU_ID_BOOK_SEARCH:
-
-                break;
-            case Params.MENU_ID_APP_SETTINGS:
+            case Params.MENU_APP_SETTINGS:
                 //fragment = SettingsFragment.newInstance("","");
                 break;
-            case Params.MENU_ID_APP_STATISTICS:
+            case Params.MENU_APP_STATISTICS:
                 //fragment = StatisticsFragment.newInstance("","");
                 break;
-            case Params.MENU_ID_APP_LOGIN:
+            case Params.MENU_APP_LOGIN:
                 //fragment = LoginFragment.newInstance("","");
                 break;
             default:
                 break;
         }
-
-        openFragment(fragment, position, bundle);
+        openFragment(fragment, position, arguments);
         // Insert the fragment by replacing any existing fragment
     }
 
@@ -180,8 +177,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
             bundleArgs.putStringArray("TITLES", Params.MENU_TITLES);
             fragment.setArguments(bundleArgs);
             FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, fragment).commit();
+            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
 
             // Highlight the selected item, update the title, and close the drawer
             mDrawerList.setItemChecked(position, true);
@@ -218,6 +214,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
+
     /*
     * Ниже представлены реализации интерфейсов некоторых
     * фрагментов для того что бы они могли в данное активити передавать
@@ -232,7 +229,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         * */
         Fragment fragment = BookReadingFragment.newInstance(bookPath);
         if (fragment != null) {
-            openFragment(fragment, Params.MENU_ID_BOOK_SHELF, fragment.getArguments());
+            openFragment(fragment, Params.MENU_BOOK_SHELF, fragment.getArguments());
         }
     }
 
@@ -245,7 +242,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         * */
         Fragment fragment = BookInfoFragment.newInstance(book);
         if (fragment != null) {
-            openFragment(fragment, Params.MENU_ID_BOOK_SHELF, fragment.getArguments());
+            openFragment(fragment, Params.MENU_BOOK_SHELF, fragment.getArguments());
         }
     }
 
@@ -260,7 +257,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         * */
         Fragment fragment = BookReadingFragment.newInstance(book);
         if (fragment != null) {
-            openFragment(fragment, Params.MENU_ID_BOOK_SHELF, fragment.getArguments());
+            openFragment(fragment, Params.MENU_BOOK_SHELF, fragment.getArguments());
         }
     }
 

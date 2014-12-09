@@ -13,7 +13,7 @@ public class ImageUtils {
     * Метод нужен для декодинга картинки из закодированной строчки в
     * формате Base64 в обычный битмап
     * */
-    public static Bitmap decodeToImage(String imageString) {
+    public static Bitmap decodeStringToImage(String imageString) {
         Bitmap image = null;
         try {
             byte[] img = Base64.decode(imageString, Base64.DEFAULT);

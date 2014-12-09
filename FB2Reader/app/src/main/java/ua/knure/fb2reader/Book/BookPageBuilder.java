@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 /**
@@ -17,7 +18,7 @@ import java.util.Queue;
 public class BookPageBuilder {
     private static final int WHITE_SPACE = 1;
     private final String WITHOUT_TITLE = null;
-    private Collection<BookPage> bookPages;
+    private List<BookPage> bookPages;
     private Document book;
     private int linesAmount;
     private int linesLength;
@@ -34,7 +35,7 @@ public class BookPageBuilder {
         this.syllables = syllables;
     }
 
-    public Collection<BookPage> buildPages() {
+    public List<BookPage> buildPages() {
         Element root = book.getDocumentElement();
         NodeList listOfTags = root.getElementsByTagName("section");
         int listOfTagsLength = listOfTags.getLength();

@@ -25,6 +25,7 @@ import ua.knure.fb2reader.Views.Params;
 * */
 public class BookInfoFragment extends Fragment {
     private Book book;
+
     private OnBackToReadingListener onBackToReadingListener;
 
     /*
@@ -39,9 +40,9 @@ public class BookInfoFragment extends Fragment {
      * */
     public static BookInfoFragment newInstance(Book book) {
         BookInfoFragment fragment = new BookInfoFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(Params.ARGUMENT_SERIALIZED_BOOK, book);
-        fragment.setArguments(bundle);
+        Bundle arguments = new Bundle();
+        arguments.putSerializable(Params.ARG_SERIALIZED_BOOK, book);
+        fragment.setArguments(arguments);
         return fragment;
     }
 
@@ -57,10 +58,8 @@ public class BookInfoFragment extends Fragment {
     * Грубо говоря здесь все заполнения нашего фрагмента информацией из переданной книги
     * */
         TextView myTextView = (TextView) view.findViewById(R.id.textView_book_info);
-        final View mView = view;
-
-        Bundle args = getArguments();
-        book = (Book) args.getSerializable(Params.ARGUMENT_SERIALIZED_BOOK);
+        Bundle arguments = getArguments();
+        book = (Book) arguments.getSerializable(Params.ARG_SERIALIZED_BOOK);
 
         if (book != null && myTextView != null) {
             myTextView.setMovementMethod(new ScrollingMovementMethod());
@@ -118,7 +117,7 @@ public class BookInfoFragment extends Fragment {
                 открытие окна для чтения книги*/
             }
         });
-        getActivity().getActionBar().setTitle(Params.MENU_TITLES[Params.MENU_ID_BOOK_INFO]);
+        getActivity().getActionBar().setTitle(Params.MENU_TITLES[Params.MENU_BOOK_INFO]);
     }
 
     /*

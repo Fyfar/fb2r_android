@@ -8,7 +8,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import ua.knure.fb2reader.DataAccess.ImageUtils;
 
@@ -23,33 +23,34 @@ import ua.knure.fb2reader.DataAccess.ImageUtils;
 * ничего больше не понадобилось =) )
 * */
 public class Book implements Serializable {
-    private Document book;
-    private BookInfo info;
-    private Collection<BookPage> pages;
+    private Document bookDocument;
+    private BookInfo bookInfo;
+    private List<BookPage> bookPages;
     private int numberOfLastPage; /* пока что нигде не используется потому что не реализовано сохранение прогресса*/
+    private int numberOfPages;
     private int charactersPerLine;
     private int linesPerPage;
     private SyllablesPartitionable syllables;
-    private Bitmap cover;
-    private String fullPath;
+    private Bitmap bookCoverBitmap;
+    private String bookFullPathInStorage;
 
-    public Book(Document book, int charactersPerLine, int linesPerPage, int numberOfLastPage, SyllablesPartitionable syllables) {//Parsed document(book)
-        this.book = book;
+    public Book(Document bookDocument, int charactersPerLine, int linesPerPage, int numberOfLastPage, SyllablesPartitionable syllables) {//Parsed document(bookDocument)
+        this.bookDocument = bookDocument;
         this.charactersPerLine = charactersPerLine;
         this.linesPerPage = linesPerPage;
         this.syllables = syllables;
         if (numberOfLastPage >= 0) {
             this.numberOfLastPage = numberOfLastPage;
         }
-        cover = getImageFromBook();
-        info = new BookInfo(book);
-        pages = new ArrayList<>();
+        bookCoverBitmap = getImageFromBook();
+        bookInfo = new BookInfo(bookDocument);
+        bookPages = new ArrayList<>();
         createPages();
-        cover = getImageFromBook();
+        bookCoverBitmap = getImageFromBook();
     }
 
     private Bitmap getImageFromBook() {
-        NodeList element = book.getElementsByTagName("binary");
+        NodeList element = bookDocument.getElementsByTagName("binary");
         int count = element.getLength();
         Bitmap finalImage;
         Bitmap b;
@@ -69,7 +70,7 @@ public class Book implements Serializable {
             }
             if (((Element) element.item(i)).getAttribute("id").equals("cover" + format)) {
                 String tmp = ((Element) element.item(i)).getTextContent();
-                b = ImageUtils.decodeToImage(tmp);
+                b = ImageUtils.decodeStringToImage(tmp);
                 if (b != null) {
                     finalImage = b.copy(Bitmap.Config.ARGB_8888, true);
                     return finalImage;
@@ -80,38 +81,42 @@ public class Book implements Serializable {
     }
 
     private void createPages() {
-        BookPageBuilder builder = new BookPageBuilder(book, charactersPerLine, linesPerPage, syllables);
-        pages = builder.buildPages();
+        BookPageBuilder builder = new BookPageBuilder(bookDocument, charactersPerLine, linesPerPage, syllables);
+        bookPages = builder.buildPages();
+        numberOfPages = bookPages.size();
     }
 
-    public Collection<BookPage> getPages() {
-        return pages;
+    public List<BookPage> getBookPages() {
+        return bookPages;
     }
 
     public BookInfo getBookInfo() {
-        return info;
+        return bookInfo;
     }
 
     public Bitmap getBookCover() {
-        return cover;
+        return bookCoverBitmap;
     }
 
     public int getCharsPerLine() {
         return charactersPerLine;
     }
 
-    public void setLastPageNumber(int number) {
-        if (number > 0 && number < pages.size()) {
+    public int getNumberOfLastPage() {
+        return numberOfLastPage;
+    }
+
+    public void setNumberOfLastPage(int number) {
+        if (number > 0 && number < bookPages.size()) {
             numberOfLastPage = number;
         }
     }
 
-    public void setFullPath(String fullPath) {
-        this.fullPath = fullPath;
+    public String getBookFullPathInStorage() {
+        return bookFullPathInStorage;
     }
 
-    public String getFullPath() {
-        return fullPath;
+    public void setBookFullPathInStorage(String bookFullPathInStorage) {
+        this.bookFullPathInStorage = bookFullPathInStorage;
     }
-
 }
