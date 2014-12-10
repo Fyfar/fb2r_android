@@ -74,8 +74,7 @@ public class BookPageBuilder {
                     String currentTitleString = title[i];
                     if (currentTitleString.length() < linesLength) {
                         StringBuilder sb = new StringBuilder();
-                        int center = currentTitleString.length() % 2 == 0 ?
-                                (linesLength - currentTitleString.length()) / 3 : (linesLength - currentTitleString.length()) / 2;
+                        int center = (linesLength - currentTitleString.length())/2;
                         for (int k = 0; k < center; k++) {
                             sb.append(" ");
                         }
