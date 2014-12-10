@@ -37,7 +37,6 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
     private ActionBarDrawerToggle mDrawerToggle;
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
-
     private Book lastOpenedBook;
     private boolean isLogined = true;
 
@@ -229,6 +228,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         * */
         Fragment fragment = BookReadingFragment.newInstance(bookPath);
         if (fragment != null) {
+            fragment.getArguments().putBoolean(Params.ARG_BOOK_INFO_WAS_OPENED, true);
             openFragment(fragment, Params.MENU_BOOK_SHELF, fragment.getArguments());
         }
     }
@@ -240,6 +240,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         *  данный код выполняется после того как книжка уже отпарсена и страницы построены
         *  данный код откроет информацию о книге
         * */
+
         Fragment fragment = BookInfoFragment.newInstance(book);
         if (fragment != null) {
             openFragment(fragment, Params.MENU_BOOK_SHELF, fragment.getArguments());
@@ -255,7 +256,16 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         *  данный код открывает опять фрагмент с книжкой, только на этот
         *  раз он уже возвращает открытую книжку, что бы она не парсилась заново.
         * */
-        Fragment fragment = BookReadingFragment.newInstance(book);
+
+        Fragment fragment = null;
+        int numberOfChars = book.getCharsToLastPage();
+        if (numberOfChars > 0 ){
+            book.setNumberOfLastPage(numberOfChars/(book.getCharsPerLine()*book.getLinesPerPage()));
+            fragment = BookReadingFragment.newInstance(book);
+        }else {
+            fragment = BookReadingFragment.newInstance(book);
+        }
+
         if (fragment != null) {
             openFragment(fragment, Params.MENU_BOOK_SHELF, fragment.getArguments());
         }

@@ -15,6 +15,7 @@ import java.util.List;
 import ua.knure.fb2reader.Book.Book;
 import ua.knure.fb2reader.Book.BookPage;
 import ua.knure.fb2reader.R;
+import ua.knure.fb2reader.Utils.ViewUtils;
 import ua.knure.fb2reader.Views.Params;
 
 /**
@@ -26,10 +27,11 @@ import ua.knure.fb2reader.Views.Params;
 * */
 public class ViewPageFragment extends Fragment {
     private List<String> bookPages;
-    private int pageNumber;
     private int textSize;
     private int textColor;
     private int backgroundColor;
+    private Color textViewBackgroundColor;
+    private Color textViewTextColor;
 
     public ViewPageFragment() {
         super();
@@ -38,7 +40,6 @@ public class ViewPageFragment extends Fragment {
     public static ViewPageFragment newInstance(int page) {
         ViewPageFragment viewPageFragment = new ViewPageFragment();
         Bundle arguments = new Bundle();
-        arguments.putInt(Params.ARG_PAGE_NUMBER, page);
         viewPageFragment.setArguments(arguments);
         return viewPageFragment;
     }
@@ -47,9 +48,16 @@ public class ViewPageFragment extends Fragment {
         ViewPageFragment viewPageFragment = new ViewPageFragment();
         List<BookPage> pages = book.getBookPages();
         Bundle arguments = new Bundle();
-        arguments.putInt(Params.ARG_PAGE_NUMBER, position);
+
+        arguments.putInt(Params.ARG_CHARS_PER_LINE, book.getCharsPerLine());
         arguments.putStringArrayList(Params.ARG_PAGE_TEXT, (ArrayList<String>) pages.get(position).getLinesOnThePage());
-        arguments.putInt(Params.ARG_TEXT_SIZE, book.getCharsPerLine());
+
+        /***************************************************************/
+        int chars = ViewUtils.getCharsToCurrentPosition(book, position);
+        book.setCharsToLastPage(chars);
+        /***************************************************************/
+
+
         viewPageFragment.setArguments(arguments);
         return viewPageFragment;
     }
@@ -58,23 +66,32 @@ public class ViewPageFragment extends Fragment {
         ViewPageFragment viewPageFragment = new ViewPageFragment();
         List<BookPage> pages = book.getBookPages();
         Bundle arguments = new Bundle();
-        arguments.putInt(Params.ARG_PAGE_NUMBER, position);
-        arguments.putStringArrayList(Params.ARG_PAGE_TEXT, (ArrayList<String>) pages.get(position).getLinesOnThePage());
-        arguments.putInt(Params.ARG_TEXT_SIZE, textSize);
+
+        arguments.putInt(Params.ARG_CHARS_PER_LINE, textSize);
         arguments.putInt(Params.ARG_TEXT_COLOR, textColor);
         arguments.putInt(Params.ARG_BACKGROUND_COLOR, backgroundColor);
+        arguments.putStringArrayList(Params.ARG_PAGE_TEXT, (ArrayList<String>) pages.get(position).getLinesOnThePage());
+
+
+        /***************************************************************/
+        int chars = ViewUtils.getCharsToCurrentPosition(book, position);
+        book.setCharsToLastPage(chars);
+        book.setNumberOfLastPage(chars / (book.getCharsPerLine() * book.getLinesPerPage()));
+        /***************************************************************/
+
+
         viewPageFragment.setArguments(arguments);
         return viewPageFragment;
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        pageNumber = getArguments().getInt(Params.ARG_PAGE_NUMBER);
         bookPages = getArguments().getStringArrayList(Params.ARG_PAGE_TEXT);
         textColor = getArguments().getInt(Params.ARG_TEXT_COLOR);
         backgroundColor = getArguments().getInt(Params.ARG_BACKGROUND_COLOR);
-        textSize = getArguments().getInt(Params.ARG_TEXT_SIZE);
+        textSize = getArguments().getInt(Params.ARG_CHARS_PER_LINE);
     }
 
     @Override
@@ -85,8 +102,10 @@ public class ViewPageFragment extends Fragment {
 
         StringBuilder builder = new StringBuilder();
         if (bookPages != null && bookPages.size() > 0) {
+
             textView.setBackgroundColor(Color.WHITE);
             textView.setTextColor(Color.BLACK);
+
             Iterator<String> iterator = bookPages.iterator();
             while (iterator.hasNext()) {
                 builder.append(iterator.next().toString());
@@ -94,10 +113,12 @@ public class ViewPageFragment extends Fragment {
             textView.setText(builder.toString());
             return view;
         }
+
+
         textView.setBackgroundColor(Color.BLACK);
         textView.setTextColor(Color.BLACK);
         int NumberOfCharsInPage = 2000;
-        for (int i = 0; i < NumberOfCharsInPage; i++){
+        for (int i = 0; i < NumberOfCharsInPage; i++) {
             textView.append("W");
         }
         return view;

@@ -28,6 +28,7 @@ public class Book implements Serializable {
     private List<BookPage> bookPages;
     private int numberOfLastPage; /* пока что нигде не используется потому что не реализовано сохранение прогресса*/
     private int numberOfPages;
+    private int charsToLastPage;
     private int charactersPerLine;
     private int linesPerPage;
     private SyllablesPartitionable syllables;
@@ -47,6 +48,7 @@ public class Book implements Serializable {
         bookPages = new ArrayList<>();
         createPages();
         bookCoverBitmap = getImageFromBook();
+        charsToLastPage = 0;
     }
 
     private Bitmap getImageFromBook() {
@@ -102,8 +104,15 @@ public class Book implements Serializable {
         return charactersPerLine;
     }
 
+    public int getLinesPerPage() {
+        return linesPerPage;
+    }
+
     public int getNumberOfLastPage() {
-        return numberOfLastPage;
+        if (numberOfLastPage == 0 && charsToLastPage>0){
+            numberOfLastPage = charsToLastPage/(charactersPerLine*linesPerPage);
+        }
+        return numberOfLastPage - 1;
     }
 
     public void setNumberOfLastPage(int number) {
@@ -118,5 +127,13 @@ public class Book implements Serializable {
 
     public void setBookFullPathInStorage(String bookFullPathInStorage) {
         this.bookFullPathInStorage = bookFullPathInStorage;
+    }
+
+    public int getCharsToLastPage() {
+        return charsToLastPage;
+    }
+
+    public void setCharsToLastPage(int charsNumber) {
+        charsToLastPage = charsNumber;
     }
 }

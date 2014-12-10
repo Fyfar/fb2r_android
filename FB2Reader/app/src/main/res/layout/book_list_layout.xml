@@ -6,4 +6,5 @@
     android:paddingBottom="5dip"
     android:paddingTop="5dip"
     android:clickable="false"
-    android:gravity="center_vertical|center_horizontal" />
+    android:gravity="center_vertical|center_horizontal"
+    android:textSize="28dp" />

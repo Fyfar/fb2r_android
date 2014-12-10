@@ -15,11 +15,8 @@ public class BookInfo {
     private List<String> genre;
     private List<String> translator;
     private List<String> publishInfo;
-    private List<String> customInfo;
-    private List<String> bookTitle;
     private List<String> bookName;
     private List<String> annotation;
-    private List<String> bookYear;
 
     private Document document;
 
@@ -31,21 +28,15 @@ public class BookInfo {
         genre = new ArrayList<>();
         translator = new ArrayList<>();
         publishInfo = new ArrayList<>();
-        customInfo = new ArrayList<>();
-        bookTitle = new ArrayList<>();
         bookName = new ArrayList<>();
         annotation = new ArrayList<>();
-        bookYear = new ArrayList<>();
         this.document = document;
         setAuthorsInfo();
-        setCustomInfo();
         setGenre();
         setPublishInfo();
         setTranslator();
-        setBookTitle();
         setBookName();
         setAnnotation();
-        setBookYear();
     }
 
     private void setInfo(String tag, Collection<String> collection) {
@@ -58,7 +49,33 @@ public class BookInfo {
     }
 
     private void setAuthorsInfo() {
-        setInfo("author", authors);
+        Element root = document.getDocumentElement();
+        int count = root.getElementsByTagName("author").getLength();
+        for (int i = 0; i < count; i++) {
+            Element message = (Element) root.getElementsByTagName("author").item(i);
+            if (((Element) message.getParentNode()).getTagName().equals("title-info")) {
+                Element firstName = (Element) message.getElementsByTagName("first-name").item(i);
+                Element lastName = (Element) message.getElementsByTagName("last-name").item(i);
+                Element middleName = (Element) message.getElementsByTagName("middle-name").item(i);
+                String first, last, middle;
+                try {
+                    first = firstName.getTextContent();
+                } catch (NullPointerException ex) {
+                    first = " ";
+                }
+                try {
+                    middle = middleName.getTextContent();
+                } catch (NullPointerException ex) {
+                    middle = " ";
+                }
+                try {
+                    last = lastName.getTextContent();
+                } catch (NullPointerException ex) {
+                    last = " ";
+                }
+                authors.add(first + " " + middle + " " + last);
+            }
+        }
     }
 
     private void setGenre() {
@@ -66,19 +83,64 @@ public class BookInfo {
     }
 
     private void setTranslator() {
-        setInfo("translator", translator);
+        Element root = document.getDocumentElement();
+        int count = root.getElementsByTagName("translator").getLength();
+        for (int i = 0; i < count; i++) {
+            Element message = (Element) root.getElementsByTagName("translator").item(i);
+            if (((Element) message.getParentNode()).getTagName().equals("title-info")) {
+                Element firstName = (Element) message.getElementsByTagName("first-name").item(i);
+                Element lastName = (Element) message.getElementsByTagName("last-name").item(i);
+                Element middleName = (Element) message.getElementsByTagName("middle-name").item(i);
+                String first, last, middle;
+                try {
+                    first = firstName.getTextContent();
+                } catch (NullPointerException ex) {
+                    first = " ";
+                }
+                try {
+                    middle = middleName.getTextContent();
+                } catch (NullPointerException ex) {
+                    middle = " ";
+                }
+                try {
+                    last = lastName.getTextContent();
+                } catch (NullPointerException ex) {
+                    last = " ";
+                }
+                translator.add(first + " " + middle + " " + last);
+            }
+        }
     }
 
     private void setPublishInfo() {
-        setInfo("publish-info", publishInfo);
-    }
+        Element root = document.getDocumentElement();
+        int count = root.getElementsByTagName("publish-info").getLength();
+        for (int i = 0; i < count; i++) {
+            Element message = (Element) root.getElementsByTagName("publish-info").item(i);
+            if (((Element) message.getParentNode()).getTagName().equals("description")) {
 
-    private void setCustomInfo() {
-        setInfo("custom-info", customInfo);
-    }
-
-    private void setBookTitle() {
-        setInfo("book-title", bookTitle);
+                Element bookName = (Element) message.getElementsByTagName("book-name").item(i);
+                Element publisherName = (Element) message.getElementsByTagName("publisher").item(i);
+                Element bookYear = (Element) message.getElementsByTagName("year").item(i);
+                String book_name, publisher_name, year;
+                try {
+                    book_name = bookName.getTextContent();
+                } catch (NullPointerException ex) {
+                    book_name = " ";
+                }
+                try {
+                    year = bookYear.getTextContent();
+                } catch (NullPointerException ex) {
+                    year = " ";
+                }
+                try {
+                    publisher_name = publisherName.getTextContent();
+                } catch (NullPointerException ex) {
+                    publisher_name = " ";
+                }
+                publishInfo.add(book_name + "\n" + publisher_name + "\n" + year);
+            }
+        }
     }
 
     private void setBookName() {
@@ -87,10 +149,6 @@ public class BookInfo {
 
     private void setAnnotation() {
         setInfo("annotation", annotation);
-    }
-
-    private void setBookYear() {
-        setInfo("year", bookYear);
     }
 
     public List<String> getAuthors() {
@@ -109,14 +167,6 @@ public class BookInfo {
         return publishInfo;
     }
 
-    public List<String> getCustomInfo() {
-        return customInfo;
-    }
-
-    public List<String> getBookTitle() {
-        return bookTitle;
-    }
-
     public List<String> getBookName() {
         return bookName;
     }
@@ -124,9 +174,4 @@ public class BookInfo {
     public List<String> getAnnotation() {
         return annotation;
     }
-
-    public List<String> getBookYear() {
-        return bookYear;
-    }
-
 }

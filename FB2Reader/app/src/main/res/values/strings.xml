@@ -26,5 +26,6 @@
     <string name="screen_one">Screen one</string>
     <string name="screen_two">Screen two</string>
     <string name="screen_three">Screen three</string>
+    <string name="ReadButtonText">Read</string>
 
 </resources>

@@ -7,6 +7,8 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import ua.knure.fb2reader.Book.Book;
+
 /**
  * Created by Александр on 30.11.2014.
  */
@@ -30,6 +32,17 @@ public class ViewUtils {
             }
         }
         return charCount;
+    }
+
+    /*
+    * Возвращает количество символов до данной открытой страницы
+    * */
+    public static int getCharsToCurrentPosition(Book book, int position) {
+        int count = 0;
+        for (int i = 0; i < position; i++) {
+            count += book.getCharsPerLine() * book.getLinesPerPage();
+        }
+        return count;
     }
 
     /*
