@@ -26,6 +26,7 @@ public class Book implements Serializable {
     private Document bookDocument;
     private BookInfo bookInfo;
     private List<BookPage> bookPages;
+    private List<BookBookmark> bookmarks;
     private int numberOfLastPage; /* пока что нигде не используется потому что не реализовано сохранение прогресса*/
     private int numberOfPages;
     private int charsToLastPage;
@@ -46,6 +47,7 @@ public class Book implements Serializable {
         bookCoverBitmap = getImageFromBook();
         bookInfo = new BookInfo(bookDocument);
         bookPages = new ArrayList<>();
+        bookmarks = new ArrayList<>();
         createPages();
         bookCoverBitmap = getImageFromBook();
         charsToLastPage = 0;
@@ -135,5 +137,13 @@ public class Book implements Serializable {
 
     public void setCharsToLastPage(int charsNumber) {
         charsToLastPage = charsNumber;
+    }
+
+    public void addBookmark(int pageNumber, int charsCounter, String text, String name){
+        BookBookmark b = new BookBookmark(pageNumber, charsCounter, text, name);
+        bookmarks.add(b);
+    }
+    public List<BookBookmark> getBookmarks(){
+        return bookmarks;
     }
 }
