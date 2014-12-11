@@ -2,6 +2,7 @@ package ua.knure.fb2reader.Views.Fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,6 +42,11 @@ public class BookShelfFragment extends Fragment {
         ArrayList<String> pathes = new ArrayList<>();
         files.clear();
         pathes.clear();
+
+
+        if (!DataAccess.STANDART_BOOK_FOLDER_DIRECTORY.exists()) {
+            DataAccess.STANDART_BOOK_FOLDER_DIRECTORY.mkdir();
+        }
 
         for (File file : DataAccess.getAllFilesInBooksFolder(DataAccess.STANDART_BOOK_FOLDER_DIRECTORY)) {
             files.add(file.getName().substring(0, file.getName().lastIndexOf('.')));

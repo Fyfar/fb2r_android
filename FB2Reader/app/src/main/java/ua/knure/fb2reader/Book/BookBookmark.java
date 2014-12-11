@@ -16,6 +16,13 @@ public class BookBookmark {
         this.text = text;
     }
 
+    @Override
+    public String toString() {
+        return "[bookmarkName = " + bookmarkName + " charsCounter = "
+                + charsCounter + " pageNumber = " + pageNumber + " text = " + text + "]";
+
+    }
+
     public String getBookmarkName() {
         return bookmarkName;
     }

@@ -1,17 +1,23 @@
 package ua.knure.fb2reader.Views.Fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.Date;
+
 import ua.knure.fb2reader.Book.Book;
+import ua.knure.fb2reader.DataAccess.DAO;
 import ua.knure.fb2reader.DataAccess.DataAccess;
 import ua.knure.fb2reader.R;
 import ua.knure.fb2reader.Utils.ViewUtils;
@@ -26,6 +32,7 @@ public class BookReadingFragment extends Fragment {
     private ViewPager viewPager;
     private PagerAdapter viewPagerAdapter;
     private Book book;
+    private Context ctx;
 
     /* Интерфейсы которые должны быть реализованы в предке(того кто содержит, а не того кого наследует)
      * данного фрагмента (главное активити)
@@ -72,6 +79,7 @@ public class BookReadingFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        ctx = getActivity().getBaseContext();
         viewPager = (ViewPager) view.findViewById(R.id.ViewPagerID_Screen_One);
         viewPagerAdapter = new BookPageFragmentPagerAdapter(getActivity().getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);
@@ -87,6 +95,13 @@ public class BookReadingFragment extends Fragment {
             public void onPageSelected(int i) {
                 if (book != null) {
                     onBookOpenedListener.onBookOpenedEvent(book);
+                    String email = PreferenceManager
+                            .getDefaultSharedPreferences(ctx).getString("email", "");
+                    String bookPath = PreferenceManager
+                            .getDefaultSharedPreferences(ctx).getString("currentBook", "");
+                    Log.d("myLogs", "i = " + i + " lastChar = " + book.getCharsToLastPage() + "  "
+                            + bookPath + "email = " + email);
+                    DAO.updateBook(DAO.BOOKS_TABLE, new Date(), book.getCharsToLastPage(), bookPath, email);
                 }
             }
 
@@ -94,6 +109,7 @@ public class BookReadingFragment extends Fragment {
             public void onPageScrollStateChanged(int i) {
 
             }
+
         });
         /*
         * Отложенный запуск книги для того что бы перед тем как начать открывать книгу
@@ -119,7 +135,12 @@ public class BookReadingFragment extends Fragment {
 
                 viewPagerAdapter = new BookPageFragmentPagerAdapter(getActivity().getSupportFragmentManager(), book);
                 viewPagerAdapter.notifyDataSetChanged();
+                int chars = book.getCharsToLastPage();
+                int lastPage = book.getNumberOfLastPage();
                 viewPager.setAdapter(viewPagerAdapter);
+                book.setCharsToLastPage(chars);
+                book.setNumberOfLastPage(lastPage + 1);
+
                 String bookNameInActionBar;
                 try {
                     bookNameInActionBar = book.getBookInfo().getBookName().get(0);

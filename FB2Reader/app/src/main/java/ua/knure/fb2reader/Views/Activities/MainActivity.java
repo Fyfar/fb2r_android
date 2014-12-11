@@ -1,13 +1,16 @@
 package ua.knure.fb2reader.Views.Activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -18,6 +21,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import ua.knure.fb2reader.Book.Book;
+import ua.knure.fb2reader.DataAccess.DAO;
 import ua.knure.fb2reader.R;
 import ua.knure.fb2reader.Views.Fragments.BookInfoFragment;
 import ua.knure.fb2reader.Views.Fragments.BookReadingFragment;
@@ -290,6 +294,12 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
             openFragment(fragment, Params.MENU_BOOK_SHELF, fragment.getArguments());
         }
         lastOpenedBook = book;
+        SharedPreferences sdPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences.Editor ed = sdPref.edit();
+        String[] filePath = book.getBookFullPathInStorage().split("/");
+        Log.d("myLogs", "book = " + filePath[filePath.length - 1]);
+        ed.putString("currentBook", filePath[filePath.length - 1]);
+        ed.commit();
     }
 
     @Override
@@ -308,6 +318,11 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
     public void addBookmarkEvent(int page, int charsCounter, String text, String name) {
         Toast.makeText(this.getApplicationContext(), text, Toast.LENGTH_LONG).show();
         lastOpenedBook.addBookmark(page, charsCounter, text, name);
+        String email = PreferenceManager.getDefaultSharedPreferences(getBaseContext())
+                .getString("email", "");
+        DAO.addBookMark(email, name, text, page, charsCounter);
+        Log.d("myLogs", "[bookmarkName = " + name + " charsCounter = "
+                + charsCounter + " pageNumber = " + page + " text = " + text + "]");
     }
 
     /*

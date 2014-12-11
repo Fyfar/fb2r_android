@@ -158,14 +158,14 @@ public class SyncService extends Service {
             String responseBody = EntityUtils.toString(response.getEntity());
 
             if (responseBody != null) {
-                Log.d("myLogs", responseBody);
-                Log.d("myLogs", " json = " + book.getBookName() + " " + book.getLastChar());
+                // Log.d("myLogs", " json = " + book.getBookName() + " " + book.getLastChar());
                 JSONObject json = new JSONObject(responseBody);
                 Log.d("myLogs", " json = " + book.getBookName() + " " + book.getLastChar() + " " + json.toString());
+                Log.d("myLogs", "status = " + json.getString("status"));
                 JSONArray arr = json.getJSONArray("books");
                 dao.updateBooks(arr, email);
             } else
-                result = "Did not work!";
+                Log.d("myLogs", "responseBody is null");
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         }

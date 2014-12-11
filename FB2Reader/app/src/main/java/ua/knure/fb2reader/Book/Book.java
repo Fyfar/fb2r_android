@@ -1,6 +1,7 @@
 package ua.knure.fb2reader.Book;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

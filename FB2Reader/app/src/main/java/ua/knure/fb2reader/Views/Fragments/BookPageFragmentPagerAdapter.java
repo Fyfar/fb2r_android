@@ -46,7 +46,6 @@ public class BookPageFragmentPagerAdapter extends FragmentStatePagerAdapter {
         if (book == null) {
             return ViewPageFragment.newInstance(position);
         }
-        Log.d("myLogs", "lastChar = " + getLastChar(position) + "  " + book.getBookFullPathInStorage());
         return ViewPageFragment.newInstance(position, book);
     }
 
@@ -62,15 +61,5 @@ public class BookPageFragmentPagerAdapter extends FragmentStatePagerAdapter {
     public CharSequence getPageTitle(int position) {
         position++;
         return " " + position;
-    }
-
-    private int getLastChar(int pos) {
-        int lastChar = 0;
-        for(int i = 0; i < pos; i++) {
-            for(String line : book.getBookPages().get(i).getLinesOnThePage()) {
-                lastChar += line.length();
-            }
-        }
-        return lastChar + 1;
     }
 }
