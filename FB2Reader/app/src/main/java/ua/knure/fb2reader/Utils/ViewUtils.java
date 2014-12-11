@@ -14,6 +14,8 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import ua.knure.fb2reader.Book.Book;
+
 /**
  * Created by Александр on 30.11.2014.
  */
@@ -26,17 +28,31 @@ public class ViewUtils {
         if (view == null) {
             return 0;
         }
-        String text = "This string is using for calculate line width value in text view";
+        StringBuilder text = new StringBuilder();
+        for (int i = 0; i < 20000; i++){
+            text.append("W");
+        }
         int textViewWidth = view.getWidth();
         int charCount;
 
         Paint paint = view.getPaint();
         for (charCount = 1; charCount <= text.length(); ++charCount) {
-            if (paint.measureText(text, 0, charCount) > textViewWidth) {
+            if (paint.measureText(text.toString(), 0, charCount) > textViewWidth) {
                 break;
             }
         }
         return charCount;
+    }
+
+    /*
+    * Возвращает количество символов до данной открытой страницы
+    * */
+    public static int getCharsToCurrentPosition(Book book, int position) {
+        int count = 0;
+        for (int i = 0; i < position; i++) {
+            count += book.getCharsPerLine() * book.getLinesPerPage();
+        }
+        return count;
     }
 
     /*

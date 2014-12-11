@@ -21,8 +21,6 @@ import ua.knure.fb2reader.Views.Params;
 * В этом фрагменте отображается открытая книжка
 * */
 public class BookReadingFragment extends Fragment {
-
-
     private int numberOfCharsPerLine;
     private int numberOfLinesPerScreen;
     private ViewPager viewPager;
@@ -66,18 +64,6 @@ public class BookReadingFragment extends Fragment {
         return fragment;
     }
 
-    /* Метод-фабрика который будет создавать фрагмент с переданными в него
-     * параметрами (в данном случае мы кладем туда открытую книгу и страницу
-     * которая должна отобразится. Но пока что здесь нету нужной реализации)
-     * */
-    public static BookReadingFragment newInstance(Book book, int lastPage) {
-        BookReadingFragment fragment = new BookReadingFragment();
-        Bundle arguments = new Bundle();
-        arguments.putSerializable(Params.ARG_SERIALIZED_BOOK, book);
-        fragment.setArguments(arguments);
-        return fragment;
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.book_reading_fragment, container, false);
@@ -91,6 +77,24 @@ public class BookReadingFragment extends Fragment {
         viewPager.setAdapter(viewPagerAdapter);
         getActivity().getActionBar().setTitle("Opening..."); /*в экшенбаре устанавливаем нужный(текущий) заголовок активити*/
 
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i2) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                if (book != null) {
+                    onBookOpenedListener.onBookOpenedEvent(book);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
         /*
         * Отложенный запуск книги для того что бы перед тем как начать открывать книгу
         * запустился активити с однотонным экраном для подсчета символов и строк что бы
@@ -103,6 +107,7 @@ public class BookReadingFragment extends Fragment {
                 numberOfCharsPerLine = ViewUtils.getNumberOfCharsPerLine(view);
                 numberOfLinesPerScreen = ViewUtils.getNumberOfLinesPerScreen(view);
                 Bundle arguments = getArguments(); /* получения переданных аргументов с активити **/
+
                 String bookPath = arguments.getString(Params.ARG_BOOK_PATH);
                 boolean isOpeningInfo = arguments.getBoolean(Params.ARG_BOOK_INFO_WAS_OPENED);
                 book = (Book) arguments.getSerializable(Params.ARG_SERIALIZED_BOOK);
@@ -123,6 +128,9 @@ public class BookReadingFragment extends Fragment {
                 }
                 if (bookNameInActionBar != null) {
                     getActivity().getActionBar().setTitle(bookNameInActionBar);
+                }
+                if (book.getNumberOfLastPage() > 0) {
+                    viewPager.setCurrentItem(book.getNumberOfLastPage());
                 }
 
                 onBookOpenedListener.onBookOpenedEvent(book);/* оповещаем главный активити о окрытой книге и передаем ему ссылку на нее*/

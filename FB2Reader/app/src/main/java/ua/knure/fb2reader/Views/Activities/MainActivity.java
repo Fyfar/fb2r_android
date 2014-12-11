@@ -22,6 +22,7 @@ import ua.knure.fb2reader.R;
 import ua.knure.fb2reader.Views.Fragments.BookInfoFragment;
 import ua.knure.fb2reader.Views.Fragments.BookReadingFragment;
 import ua.knure.fb2reader.Views.Fragments.BookShelfFragment;
+import ua.knure.fb2reader.Views.Fragments.BookmarkAddDialogFragment;
 import ua.knure.fb2reader.Views.Params;
 import ua.knure.fb2reader.dropbox.SyncService;
 
@@ -32,14 +33,13 @@ import ua.knure.fb2reader.dropbox.SyncService;
 * **/
 public class MainActivity extends ActionBarActivity implements BookShelfFragment.OnBookSelectedListener,
         BookReadingFragment.OnInfoPageOpeningListener, BookInfoFragment.OnBackToReadingListener,
-        BookReadingFragment.OnBookOpenedListener {
+        BookReadingFragment.OnBookOpenedListener, BookmarkAddDialogFragment.OnBookmarkAddListener {
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
-
     private Book lastOpenedBook;
     private boolean isLogined = true;
 
@@ -160,7 +160,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
                 }
                 break;
             case Params.MENU_BOOK_ADD_BOOKMARK:
-                //fragment = AddBookmarkFragment.newInstance("","");
+                addBookmarkDialog();
                 break;
             case Params.MENU_BOOK_SEARCH:
 
@@ -177,8 +177,17 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
             default:
                 break;
         }
-        openFragment(fragment, position, arguments);
+        if (fragment != null) {
+            openFragment(fragment, position, arguments);
+        }
         // Insert the fragment by replacing any existing fragment
+    }
+
+    private void addBookmarkDialog() {
+        if (lastOpenedBook != null) {
+            BookmarkAddDialogFragment dialog = BookmarkAddDialogFragment.newInstance(lastOpenedBook);
+            dialog.show(this.getSupportFragmentManager(), "");
+        }
     }
 
     private void openFragment(Fragment fragment, int position, Bundle bundleArgs) {
@@ -238,6 +247,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         * */
         Fragment fragment = BookReadingFragment.newInstance(bookPath);
         if (fragment != null) {
+            fragment.getArguments().putBoolean(Params.ARG_BOOK_INFO_WAS_OPENED, true);
             openFragment(fragment, Params.MENU_BOOK_SHELF, fragment.getArguments());
         }
     }
@@ -249,10 +259,12 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         *  данный код выполняется после того как книжка уже отпарсена и страницы построены
         *  данный код откроет информацию о книге
         * */
+
         Fragment fragment = BookInfoFragment.newInstance(book);
         if (fragment != null) {
             openFragment(fragment, Params.MENU_BOOK_SHELF, fragment.getArguments());
         }
+        lastOpenedBook = book;
     }
 
     @Override
@@ -264,10 +276,20 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         *  данный код открывает опять фрагмент с книжкой, только на этот
         *  раз он уже возвращает открытую книжку, что бы она не парсилась заново.
         * */
-        Fragment fragment = BookReadingFragment.newInstance(book);
+
+        Fragment fragment = null;
+        int numberOfChars = book.getCharsToLastPage();
+        if (numberOfChars > 0) {
+            book.setNumberOfLastPage(numberOfChars / (book.getCharsPerLine() * book.getLinesPerPage()));
+            fragment = BookReadingFragment.newInstance(book);
+        } else {
+            fragment = BookReadingFragment.newInstance(book);
+        }
+
         if (fragment != null) {
             openFragment(fragment, Params.MENU_BOOK_SHELF, fragment.getArguments());
         }
+        lastOpenedBook = book;
     }
 
     @Override
@@ -280,6 +302,12 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         * */
 
         lastOpenedBook = book;
+    }
+
+    @Override
+    public void addBookmarkEvent(int page, int charsCounter, String text, String name) {
+        Toast.makeText(this.getApplicationContext(), text, Toast.LENGTH_LONG).show();
+        lastOpenedBook.addBookmark(page, charsCounter, text, name);
     }
 
     /*

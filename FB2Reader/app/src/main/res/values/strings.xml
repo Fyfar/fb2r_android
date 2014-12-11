@@ -26,5 +26,8 @@
     <string name="screen_one">Screen one</string>
     <string name="screen_two">Screen two</string>
     <string name="screen_three">Screen three</string>
+    <string name="ReadButtonText">Read</string>
+    <string name="edittext_bookmark_name_hint">bookmark name</string>
+    <string name="bookmark_edittext_bookmarktext">text of bookmark</string>
 
 </resources>

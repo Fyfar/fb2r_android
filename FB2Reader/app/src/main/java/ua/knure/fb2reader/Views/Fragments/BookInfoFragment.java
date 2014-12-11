@@ -4,16 +4,16 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.SpannableString;
-import android.text.method.ScrollingMovementMethod;
-import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import ua.knure.fb2reader.Book.Book;
 import ua.knure.fb2reader.R;
@@ -25,6 +25,9 @@ import ua.knure.fb2reader.Views.Params;
 * */
 public class BookInfoFragment extends Fragment {
     private Book book;
+    private BookInfoListAdapter arrayAdapter;
+    private List<String> headers;
+    private List<String> texts;
 
     private OnBackToReadingListener onBackToReadingListener;
 
@@ -60,52 +63,64 @@ public class BookInfoFragment extends Fragment {
         TextView myTextView = (TextView) view.findViewById(R.id.textView_book_info);
         Bundle arguments = getArguments();
         book = (Book) arguments.getSerializable(Params.ARG_SERIALIZED_BOOK);
+        headers = new ArrayList<>();
+        texts = new ArrayList<>();
 
         if (book != null && myTextView != null) {
-            myTextView.setMovementMethod(new ScrollingMovementMethod());
-
             Bitmap bitmapDrawable = book.getBookCover(); /* обложка книги */
-            ImageSpan is = new ImageSpan(view.getContext(), bitmapDrawable);
-            SpannableString ss = new SpannableString("        ");
-            ss.setSpan(is, 1, 2, 0);
-            myTextView.append(ss);
 
             StringBuilder temp = new StringBuilder();
-            Iterator<String> iterator = book.getBookInfo().getBookName().iterator();
 
-            temp.append("\nBook name :\n");
+            Iterator<String> iterator = book.getBookInfo().getBookName().iterator();
             temp.append(getInfoFromIterator(iterator));
-            myTextView.append(temp.toString());
+            if (temp.length() > 3) {
+                headers.add("NAME");
+                texts.add(temp.toString());
+            }
 
             temp = new StringBuilder();
-            temp.append("\nBook author(s):\n");
             iterator = book.getBookInfo().getAuthors().iterator();
             temp.append(getInfoFromIterator(iterator));
-            myTextView.append(temp.toString());
+            if (temp.length() > 3) {
+                headers.add("AUTHOR(S)");
+                texts.add(temp.toString());
+            }
 
             temp = new StringBuilder();
-            temp.append("\nBook publisher(s):\n");
             iterator = book.getBookInfo().getPublishInfo().iterator();
             temp.append(getInfoFromIterator(iterator));
-            myTextView.append(temp.toString());
+            if (temp.length() > 3) {
+                headers.add("PUBLISH INFO");
+                texts.add(temp.toString());
+            }
 
             temp = new StringBuilder();
-            temp.append("\nBook genre(s):\n");
             iterator = book.getBookInfo().getGenre().iterator();
             temp.append(getInfoFromIterator(iterator));
-            myTextView.append(temp.toString());
+            if (temp.length() > 3) {
+                headers.add("GENRE");
+                texts.add(temp.toString());
+            }
 
             temp = new StringBuilder();
-            temp.append("\nBook translator(s):\n");
             iterator = book.getBookInfo().getTranslator().iterator();
             temp.append(getInfoFromIterator(iterator));
-            myTextView.append(temp.toString());
+            if (temp.length() > 3) {
+                headers.add("TRANSLATOR(S)");
+                texts.add(temp.toString());
+            }
 
             temp = new StringBuilder();
-            temp.append("\nAnnotation:\n");
             iterator = book.getBookInfo().getAnnotation().iterator();
             temp.append(getInfoFromIterator(iterator));
-            myTextView.append(temp.toString());
+            if (temp.length() > 3) {
+                headers.add("ANNOTATION");
+                texts.add(temp.toString());
+            }
+
+            BookInfoListAdapter adapter = new BookInfoListAdapter(getView().getContext(), headers, texts, bitmapDrawable);
+            ListView listView = (ListView) view.findViewById(R.id.info_listView);
+            listView.setAdapter(adapter);
         }
 
         Button readButton = (Button) view.findViewById(R.id.buttonRead);
