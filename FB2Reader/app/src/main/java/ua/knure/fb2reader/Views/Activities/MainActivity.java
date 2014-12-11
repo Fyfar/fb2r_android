@@ -21,8 +21,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import ua.knure.fb2reader.Book.Book;
+import ua.knure.fb2reader.DataAccess.BookDAO;
 import ua.knure.fb2reader.DataAccess.DAO;
 import ua.knure.fb2reader.R;
+import ua.knure.fb2reader.Utils.ViewUtils;
 import ua.knure.fb2reader.Views.Fragments.BookInfoFragment;
 import ua.knure.fb2reader.Views.Fragments.BookReadingFragment;
 import ua.knure.fb2reader.Views.Fragments.BookShelfFragment;
@@ -300,6 +302,8 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         Log.d("myLogs", "book = " + filePath[filePath.length - 1]);
         ed.putString("currentBook", filePath[filePath.length - 1]);
         ed.commit();
+        BookDAO bookDAO = ViewUtils.getBookFromDB(filePath[filePath.length - 1], getBaseContext());
+        Log.d("myLogs", "book = " + bookDAO.getBookName() + " lastChar = " + bookDAO.getLastChar());
     }
 
     @Override

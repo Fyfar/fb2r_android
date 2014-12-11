@@ -1,6 +1,8 @@
 package ua.knure.fb2reader.Utils;
 
+import android.content.Context;
 import android.graphics.Paint;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -15,6 +17,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import ua.knure.fb2reader.Book.Book;
+import ua.knure.fb2reader.DataAccess.BookDAO;
+import ua.knure.fb2reader.DataAccess.DAO;
 
 /**
  * Created by Александр on 30.11.2014.
@@ -85,6 +89,15 @@ public class ViewUtils {
         return hashtext;
     }
 
+    //BookName means name of the file (not the path but name of the file)
+    // Example - path = d:/folder/some.file bookName = some.file
+    //ctx - you must give method something like getBaseContext or link to the activity from which
+    //you call this method
+    public static BookDAO getBookFromDB(String bookName, Context ctx) {
+        String email = PreferenceManager.getDefaultSharedPreferences(ctx).getString("email", "");
+        return DAO.getBook(email, bookName);
+    }
+
     public static JSONObject getJson(DbxAccountInfo info) {
         Class<?> accountClass;
         Field rawJson = null;
@@ -100,11 +113,7 @@ public class ViewUtils {
         JSONObject json = null;
         try {
             json = new JSONObject((String)rawJson.get(info));
-        } catch (IllegalAccessException e2) {
-            e2.printStackTrace();
-        } catch (IllegalArgumentException e2) {
-            e2.printStackTrace();
-        } catch (JSONException e2) {
+        } catch (IllegalAccessException | IllegalArgumentException | JSONException e2) {
             e2.printStackTrace();
         }
         return json;

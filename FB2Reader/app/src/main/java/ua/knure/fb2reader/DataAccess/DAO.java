@@ -182,6 +182,25 @@ public class DAO {
         }
     }
 
+    public static BookDAO getBook(String email, String bookName) {
+        BookDAO book = new BookDAO();
+        int userId = getUserId(email);
+        Cursor all = getAllData(BOOKS_TABLE);
+        if(all.moveToFirst()) {
+            do {
+                if(all.getInt(all.getColumnIndex(USER_ID)) == userId
+                        && bookName.equals(all.getString(all.getColumnIndex(BOOK_NAME)))) {
+                    book.setBookName(bookName);
+                    book.setLastChar(all.getInt(all.getColumnIndex(LAST_CHAR)));
+                    all.close();
+                    return book;
+                }
+            } while(all.moveToNext());
+        }
+        all.close();
+        return null;
+    }
+
     public List<BookDAO> getAllBooks(String email) {
         int userId = getUserId(email);
         List<BookDAO> books = new ArrayList<>();
