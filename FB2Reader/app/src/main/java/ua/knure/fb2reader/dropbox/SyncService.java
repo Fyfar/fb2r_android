@@ -24,6 +24,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,10 +39,10 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import ua.knure.fb2reader.Utils.ViewUtils;
 import ua.knure.fb2reader.DataAccess.BookDAO;
 import ua.knure.fb2reader.DataAccess.DAO;
 import ua.knure.fb2reader.Utils.PathListener;
+import ua.knure.fb2reader.Utils.ViewUtils;
 
 public class SyncService extends Service {
 
@@ -78,7 +79,7 @@ public class SyncService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(dao.dbIsOpen()) {
+        if (dao.dbIsOpen()) {
             dao.close();
         }
     }
@@ -142,9 +143,9 @@ public class SyncService extends Service {
         HttpClient httpclient = new DefaultHttpClient();
         HttpPost httppost = new HttpPost(URL + "/" + ViewUtils.md5(email));
         Log.d("myLogs", "post Data");
-            List<NameValuePair> nameValuePairs = new ArrayList<>(2);
-            nameValuePairs.add(new BasicNameValuePair("lastChar", String.valueOf(book.getLastChar())));
-            nameValuePairs.add(new BasicNameValuePair("bookName", book.getBookName()));
+        List<NameValuePair> nameValuePairs = new ArrayList<>(2);
+        nameValuePairs.add(new BasicNameValuePair("lastChar", String.valueOf(book.getLastChar())));
+        nameValuePairs.add(new BasicNameValuePair("bookName", book.getBookName()));
         try {
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
         } catch (UnsupportedEncodingException e) {
@@ -154,15 +155,18 @@ public class SyncService extends Service {
         // Execute HTTP Post Request
         try {
             HttpResponse response = httpclient.execute(httppost);
-            // receive response as inputStream
-            inputStream = response.getEntity().getContent();
+            String responseBody = EntityUtils.toString(response.getEntity());
 
-            // convert inputstream to string
-            if (inputStream != null)
-                result = convertInputStreamToString(inputStream);
-            else
+            if (responseBody != null) {
+                Log.d("myLogs", responseBody);
+                Log.d("myLogs", " json = " + book.getBookName() + " " + book.getLastChar());
+                JSONObject json = new JSONObject(responseBody);
+                Log.d("myLogs", " json = " + book.getBookName() + " " + book.getLastChar() + " " + json.toString());
+                JSONArray arr = json.getJSONArray("books");
+                dao.updateBooks(arr, email);
+            } else
                 result = "Did not work!";
-        } catch (IOException e) {
+        } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
 
@@ -201,7 +205,7 @@ public class SyncService extends Service {
         String result = "";
         while ((line = bufferedReader.readLine()) != null)
             //Log.d("myLogs", line);
-        result += line;
+            result += line;
 
         inputStream.close();
         return result;
@@ -220,16 +224,21 @@ public class SyncService extends Service {
         @Override
         protected String doInBackground(String... urls) {
             List<BookDAO> books = dao.getAllBooks(email);
-            for(BookDAO book : books) {
+            for (BookDAO book : books) {
                 postData(book);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-            return GET(urls[0]);
+            return "";//GET(urls[0]);
         }
 
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
-            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
+          /*  //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
             JSONObject json = null;
             try {
                 json = new JSONObject(result);
@@ -237,13 +246,13 @@ public class SyncService extends Service {
                 e.printStackTrace();
             }
             try {
-                JSONArray arr = json.getJSONArray("arr");
+                JSONArray arr = (JSONArray)json.get("contents");
                 for(int i = 0; i < arr.length(); i++) {
                     Log.d("myLogs", "book " + i + " = " + arr.get(i));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
     }
 }

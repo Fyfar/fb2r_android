@@ -1,5 +1,6 @@
 package ua.knure.fb2reader.Views.Activities;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -22,6 +23,7 @@ import ua.knure.fb2reader.Views.Fragments.BookInfoFragment;
 import ua.knure.fb2reader.Views.Fragments.BookReadingFragment;
 import ua.knure.fb2reader.Views.Fragments.BookShelfFragment;
 import ua.knure.fb2reader.Views.Params;
+import ua.knure.fb2reader.dropbox.SyncService;
 
 /*
 *  Этот активити имплементирует интерфейсы некоторых фрагментов для того что бы
@@ -92,6 +94,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
                 selectItem(Params.MENU_APP_LOGIN);
             }
         }
+        startService(new Intent(this, SyncService.class));
     }
 
     @Override
@@ -127,6 +130,12 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(new Intent(this, SyncService.class));
+        super.onDestroy();
     }
 
     /**

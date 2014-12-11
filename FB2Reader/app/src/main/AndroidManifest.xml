@@ -14,29 +14,30 @@
         android:theme="@style/AppBaseTheme">
         <activity
             android:name="ua.knure.fb2reader.Views.Activities.MainActivity"
-            android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:label="@string/app_name"></activity>
         <activity android:name="com.dropbox.sync.android.DbxAuthActivity" />
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"
             android:launchMode="singleTask">
             <intent-filter>
                 <data android:scheme="db-ygam033j049nurm" />
-
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".dropbox.DropboxAuth"
-            android:label="DropboxAuth"/>
-        <activity android:name=".Views.SplashActivity"
-            android:label="Splash"/>
+        <activity
+            android:name=".dropbox.DropboxAuth"
+            android:label="DropboxAuth" />
+        <activity
+            android:name=".Views.SplashActivity"
+            android:label="Splash">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name="com.dropbox.sync.android.DbxSyncService"
             android:enabled="true"
@@ -44,7 +45,7 @@
             android:label="Dropbox Sync" />
         <service
             android:name=".dropbox.SyncService"
-            android:label="serv"/>
+            android:label="serv" />
     </application>
 
 </manifest>

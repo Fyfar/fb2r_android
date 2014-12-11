@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.os.Environment;
@@ -24,7 +25,7 @@ import ua.knure.fb2reader.DataAccess.DAO;
  * @version 1.0
  */
 public class PathListener implements DbxFileSystem.PathListener {
-	public static final String PATH = Environment.getExternalStorageDirectory() + "/.fb2reader/";
+	public static final String PATH = Environment.getExternalStorageDirectory() + "/CloudReader/";
 	
     @Override
     public void onPathChange(DbxFileSystem dbxFileSystem, DbxPath dbxPath, Mode mode) {
@@ -113,6 +114,7 @@ public class PathListener implements DbxFileSystem.PathListener {
         for(File book : books) {
             bookNames.add(book.getName());
         }
+
         dao.addBooks(bookNames, email);
     }
 }

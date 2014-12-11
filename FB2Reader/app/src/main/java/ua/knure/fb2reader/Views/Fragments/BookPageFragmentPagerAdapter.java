@@ -3,8 +3,13 @@ package ua.knure.fb2reader.Views.Fragments;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.Log;
+
+import java.util.Date;
 
 import ua.knure.fb2reader.Book.Book;
+import ua.knure.fb2reader.Book.BookPage;
+import ua.knure.fb2reader.DataAccess.DAO;
 
 /**
  * Created by Александр on 09.12.2014.
@@ -27,6 +32,7 @@ public class BookPageFragmentPagerAdapter extends FragmentStatePagerAdapter {
         if (book == null) {
             return ViewPageFragment.newInstance(position);
         }
+        Log.d("myLogs", "lastChar = " + getLastChar(position) + "  " + book.getBookFullPathInStorage());
         return ViewPageFragment.newInstance(position, book);
     }
 
@@ -42,5 +48,15 @@ public class BookPageFragmentPagerAdapter extends FragmentStatePagerAdapter {
     public CharSequence getPageTitle(int position) {
         position++;
         return " " + position;
+    }
+
+    private int getLastChar(int pos) {
+        int lastChar = 0;
+        for(int i = 0; i < pos; i++) {
+            for(String line : book.getBookPages().get(i).getLinesOnThePage()) {
+                lastChar += line.length();
+            }
+        }
+        return lastChar + 1;
     }
 }

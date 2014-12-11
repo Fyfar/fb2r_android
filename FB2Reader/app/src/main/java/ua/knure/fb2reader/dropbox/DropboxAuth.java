@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
@@ -15,6 +17,7 @@ import com.dropbox.sync.android.DbxAccountManager;
 import org.json.JSONException;
 
 import ua.knure.fb2reader.R;
+import ua.knure.fb2reader.Utils.ViewUtils;
 import ua.knure.fb2reader.Views.Activities.MainActivity;
 import ua.knure.fb2reader.DataAccess.DAO;
 import ua.knure.fb2reader.Utils.AccountInfo;
@@ -64,10 +67,10 @@ public class DropboxAuth extends Activity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_LINK_TO_DBX) {
             if (resultCode == Activity.RESULT_OK) {
-                // ... Start using Dropbox files.
                 SharedPreferences.Editor ed = PreferenceManager.getDefaultSharedPreferences(this).edit();
                 ed.putBoolean("isLinked", true);
                 ed.commit();
+
                 finish();
             }
         } else {
@@ -81,11 +84,10 @@ public class DropboxAuth extends Activity {
         DbxAccount account = mDbxAcctMgr.getLinkedAccount();
         //Log.d("myLogs", account.getUserId());
         DbxAccountInfo info = account.getAccountInfo();
-
         try {
-            String email = AccountInfo.getJson(info).getString("email");
+            String email = ViewUtils.getJson(info).getString("email");
             dao.addUser(email,
-                    AccountInfo.getJson(info).getString("user_name"), null);
+                    ViewUtils.getJson(info).getString("user_name"), null);
             SharedPreferences.Editor ed = PreferenceManager
                     .getDefaultSharedPreferences(getBaseContext()).edit();
             ed.putString("email", email);
@@ -98,9 +100,9 @@ public class DropboxAuth extends Activity {
     }
 
     public void onClickLinkToDropbox(View view) {
-        if (!mDbxAcctMgr.hasLinkedAccount()) {
+        //if (!mDbxAcctMgr.hasLinkedAccount()) {
             mDbxAcctMgr.startLink(this, REQUEST_LINK_TO_DBX);
-        }
+       // }
     }
 
   /*  public static boolean isLinked(Context context) {
