@@ -137,6 +137,7 @@ public class Book implements Serializable {
 
     public void setCharsToLastPage(int charsNumber) {
         charsToLastPage = charsNumber;
+        setNumberOfLastPage(charsNumber/(charactersPerLine*linesPerPage));
     }
 
     public void addBookmark(int pageNumber, int charsCounter, String text, String name){

@@ -77,6 +77,24 @@ public class BookReadingFragment extends Fragment {
         viewPager.setAdapter(viewPagerAdapter);
         getActivity().getActionBar().setTitle("Opening..."); /*в экшенбаре устанавливаем нужный(текущий) заголовок активити*/
 
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i2) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                if (book != null) {
+                    onBookOpenedListener.onBookOpenedEvent(book);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
         /*
         * Отложенный запуск книги для того что бы перед тем как начать открывать книгу
         * запустился активити с однотонным экраном для подсчета символов и строк что бы

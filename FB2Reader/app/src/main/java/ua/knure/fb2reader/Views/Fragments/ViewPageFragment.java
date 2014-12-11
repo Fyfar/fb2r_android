@@ -114,13 +114,9 @@ public class ViewPageFragment extends Fragment {
             return view;
         }
 
-
         textView.setBackgroundColor(Color.BLACK);
         textView.setTextColor(Color.BLACK);
-        int NumberOfCharsInPage = 2000;
-        for (int i = 0; i < NumberOfCharsInPage; i++) {
-            textView.append("W");
-        }
+        textView.append("W");
         return view;
     }
 }

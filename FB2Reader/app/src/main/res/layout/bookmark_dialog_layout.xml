@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/bookmark_name_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/edittext_bookmark_name_hint"
+        android:inputType="text"
+        android:textSize="20dp"
+        android:textStyle="italic"
+        android:typeface="monospace" />
+
+    <EditText
+        android:id="@+id/book_page_text_for_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:autoText="false"
+        android:editable="true"
+        android:hint="@string/bookmark_edittext_bookmarktext"
+        android:inputType="text|textMultiLine"
+        android:textSize="20dp"
+        android:textStyle="italic"
+        android:typeface="monospace" />
+</LinearLayout>

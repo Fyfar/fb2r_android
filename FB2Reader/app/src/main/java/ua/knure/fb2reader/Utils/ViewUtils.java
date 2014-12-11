@@ -21,13 +21,16 @@ public class ViewUtils {
         if (view == null) {
             return 0;
         }
-        String text = "This string is using for calculate line width value in text view";
+        StringBuilder text = new StringBuilder();
+        for (int i = 0; i < 20000; i++){
+            text.append("W");
+        }
         int textViewWidth = view.getWidth();
         int charCount;
 
         Paint paint = view.getPaint();
         for (charCount = 1; charCount <= text.length(); ++charCount) {
-            if (paint.measureText(text, 0, charCount) > textViewWidth) {
+            if (paint.measureText(text.toString(), 0, charCount) > textViewWidth) {
                 break;
             }
         }
