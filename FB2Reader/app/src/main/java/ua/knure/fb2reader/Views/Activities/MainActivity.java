@@ -37,9 +37,9 @@ import ua.knure.fb2reader.dropbox.SyncService;
 *  потом можно было обрабатывать события фрагментов в данном активити, например
 *  для передачи данных с одного фрагмента во второй
 * **/
-public class MainActivity extends ActionBarActivity implements BookShelfFragment.OnBookSelectedListener,
-        BookReadingFragment.OnInfoPageOpeningListener, BookInfoFragment.OnBackToReadingListener,
-        BookReadingFragment.OnBookOpenedListener, BookmarkAddDialogFragment.OnBookmarkAddListener {
+public class MainActivity extends ActionBarActivity implements BookShelfFragment.OnBookSelectedInShelfListener,
+        BookReadingFragment.OnInfoPageOpeningListener, BookInfoFragment.OnClosedBookInfoFragmentListener,
+        BookReadingFragment.OnBookStatusChangedListener, BookmarkAddDialogFragment.OnBookmarkAddListener {
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -246,7 +246,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
     * тоесть здесь описаны обработчики событий во фрагментах
     * */
     @Override
-    public void OnBookSelectedEvent(String bookPath) {
+    public void OnBookSelectedInShelfEvent(String bookPath) {
         /*
         * здесь реализован интерфейс из фрагмента bookShelfFragment
         * данный код срабатывает когда мы во фрагменте выбираем файл(книжку)
@@ -274,7 +274,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
     }
 
     @Override
-    public void OnBackToReadingEvent(Book book) {
+    public void OnClosedBookInfoFragmentsEvent(Book book) {
         /*
         *  Здесь реализован интерфейс из фрагмента BookInfoFragment
         *  данный код выполняется при нажатии кнопки "читать" во
@@ -307,7 +307,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
     }
 
     @Override
-    public void onBookOpenedEvent(Book book) {
+    public void onBookStatusChangedEvent(Book book) {
         /*
         *  Здесь реализован интерфейс из фрагмента BookReadingFragment
         *  данный код выполняется после парсинга книжки

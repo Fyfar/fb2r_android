@@ -29,7 +29,7 @@ public class BookInfoFragment extends Fragment {
     private List<String> headers;
     private List<String> texts;
 
-    private OnBackToReadingListener onBackToReadingListener;
+    private OnClosedBookInfoFragmentListener onClosedBookInfoFragmentListener;
 
     /*
     * Конструктор должен быть обязательно пустой для правильной
@@ -127,7 +127,7 @@ public class BookInfoFragment extends Fragment {
         readButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackToReadingListener.OnBackToReadingEvent(book);
+                onClosedBookInfoFragmentListener.OnClosedBookInfoFragmentsEvent(book);
                 /*передача управления главному активити
                 открытие окна для чтения книги*/
             }
@@ -168,7 +168,7 @@ public class BookInfoFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            onBackToReadingListener = (OnBackToReadingListener) activity;
+            onClosedBookInfoFragmentListener = (OnClosedBookInfoFragmentListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement onSomeEventListener");
         }
@@ -177,7 +177,7 @@ public class BookInfoFragment extends Fragment {
     /*
     * интерфейс для того что бы вернуться на фрагмент чтения книги
     * */
-    public interface OnBackToReadingListener {
-        public void OnBackToReadingEvent(Book book);
+    public interface OnClosedBookInfoFragmentListener {
+        public void OnClosedBookInfoFragmentsEvent(Book book);
     }
 }

@@ -2,7 +2,6 @@ package ua.knure.fb2reader.Views.Fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +25,7 @@ public class BookShelfFragment extends Fragment {
     private ArrayAdapter arrayAdapter;
     private List<String> fileNamesList;/* Здесь будут хранится имена файлов для отображения*/
     private List<String> filePathesList;/* Здесь будут хранится полные пути соответствующие именам файлов*/
-    private OnBookSelectedListener onBookSelectedListener;
+    private OnBookSelectedInShelfListener onBookSelectedInShelfListener;
 
     /*
     * Конструктор должен быть обязательно пустой для правильной
@@ -81,7 +80,7 @@ public class BookShelfFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String item = filePathesList.get((int) id);
-                onBookSelectedListener.OnBookSelectedEvent(item);
+                onBookSelectedInShelfListener.OnBookSelectedInShelfEvent(item);
             }
         });
         getActivity().getActionBar().setTitle(Params.MENU_TITLES[Params.MENU_BOOK_SHELF]);
@@ -95,13 +94,13 @@ public class BookShelfFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            onBookSelectedListener = (OnBookSelectedListener) activity;
+            onBookSelectedInShelfListener = (OnBookSelectedInShelfListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement onSomeEventListener");
         }
     }
 
-    public interface OnBookSelectedListener {
-        public void OnBookSelectedEvent(String bookPath);
+    public interface OnBookSelectedInShelfListener {
+        public void OnBookSelectedInShelfEvent(String bookPath);
     }
 }

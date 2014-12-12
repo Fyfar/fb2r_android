@@ -38,7 +38,7 @@ public class BookReadingFragment extends Fragment {
      * данного фрагмента (главное активити)
      * */
     private OnInfoPageOpeningListener onInfoPageOpeningListener;
-    private OnBookOpenedListener onBookOpenedListener;
+    private OnBookStatusChangedListener onBookStatusChangedListener;
     private OnSearchListener onSearchListener;
 
     /*
@@ -94,7 +94,7 @@ public class BookReadingFragment extends Fragment {
             @Override
             public void onPageSelected(int i) {
                 if (book != null) {
-                    onBookOpenedListener.onBookOpenedEvent(book);
+                    onBookStatusChangedListener.onBookStatusChangedEvent(book);
                     String email = PreferenceManager
                             .getDefaultSharedPreferences(ctx).getString("email", "");
                     String bookPath = PreferenceManager
@@ -154,7 +154,7 @@ public class BookReadingFragment extends Fragment {
                     viewPager.setCurrentItem(book.getNumberOfLastPage());
                 }
 
-                onBookOpenedListener.onBookOpenedEvent(book);/* оповещаем главный активити о окрытой книге и передаем ему ссылку на нее*/
+                onBookStatusChangedListener.onBookStatusChangedEvent(book);/* оповещаем главный активити о окрытой книге и передаем ему ссылку на нее*/
                 if (isOpeningInfo) {
                     onInfoPageOpeningListener.onInfoPageOpeningEvent(isOpeningInfo, book);
                     /*проверяем было ли открыто окно с информацией для данной книги если да то говорим
@@ -174,7 +174,7 @@ public class BookReadingFragment extends Fragment {
         super.onAttach(activity);
         try {
             onInfoPageOpeningListener = (OnInfoPageOpeningListener) activity;
-            onBookOpenedListener = (OnBookOpenedListener) activity;
+            onBookStatusChangedListener = (OnBookStatusChangedListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement onSomeEventListener");
         }
@@ -187,8 +187,8 @@ public class BookReadingFragment extends Fragment {
         public void onInfoPageOpeningEvent(boolean firstOpening, Book book);
     }
 
-    public interface OnBookOpenedListener {
-        public void onBookOpenedEvent(Book book);
+    public interface OnBookStatusChangedListener {
+        public void onBookStatusChangedEvent(Book book);
     }
 
     public interface OnSearchListener {
