@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,6 +80,7 @@ public class BookmarksListFragment extends Fragment {
         if (path!=null){
             String email = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext())
                     .getString("email", "");
+            Log.d("myLogs", email);
             Iterator<BookBookmark> iterator = DAO.getAllBookmarks(email).iterator();
 
             while (iterator.hasNext() && forAllBookmarks) {

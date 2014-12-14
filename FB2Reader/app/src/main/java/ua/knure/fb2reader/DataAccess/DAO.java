@@ -226,10 +226,11 @@ public class DAO {
             int userId = getUserId(email);
             do {
                 if(all.getInt(all.getColumnIndex(USER_ID)) == userId) {
-                    bookmarks.add(new BookBookmark(all.getInt(all.getColumnIndex(PAGE_NUMBER))
-                            , all.getInt(all.getColumnIndex(CHARS_COUNTER))
-                            , all.getString(all.getColumnIndex(BOOKMARK_TEXT))
-                            , all.getString(all.getColumnIndex(BOOK_NAME))));
+                    int page = all.getColumnIndex(PAGE_NUMBER);
+                    String text = all.getString(all.getColumnIndex(BOOKMARK_TEXT));
+                    String name = all.getString(all.getColumnIndex(BOOKMARK_NAME));
+                    int chars = all.getInt(all.getColumnIndex(CHARS_COUNTER));
+                    bookmarks.add(new BookBookmark(page, chars, text, name));
                 }
             } while(all.moveToNext());
         }
