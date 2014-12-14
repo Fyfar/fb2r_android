@@ -127,7 +127,7 @@ public class BookInfoFragment extends Fragment {
         readButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onClosedBookInfoFragmentListener.OnClosedBookInfoFragmentsEvent(book);
+                onClosedBookInfoFragmentListener.OnClosedBookInfoFragmentsEvent();
                 /*передача управления главному активити
                 открытие окна для чтения книги*/
             }
@@ -178,6 +178,6 @@ public class BookInfoFragment extends Fragment {
     * интерфейс для того что бы вернуться на фрагмент чтения книги
     * */
     public interface OnClosedBookInfoFragmentListener {
-        public void OnClosedBookInfoFragmentsEvent(Book book);
+        public void OnClosedBookInfoFragmentsEvent();
     }
 }

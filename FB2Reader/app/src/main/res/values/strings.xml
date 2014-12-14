@@ -12,12 +12,12 @@
 
     <string-array name="screen_array">
         <item>Shelf</item>
-        <item>Book Info</item>
+        <item>Current Book</item>
         <item>Add bookmark</item>
-        <item>Search</item>
-        <item>Settings</item>
+        <item>Bookmarks</item>
+       <!-- <item>Settings</item>
         <item>Statistics</item>
-        <item>Login</item>
+        <item>Login</item> -->
     </string-array>
 
     <string name="drawer_open">Open navigation drawer</string>

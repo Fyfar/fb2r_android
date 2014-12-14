@@ -28,6 +28,7 @@ import ua.knure.fb2reader.Views.Fragments.BookInfoFragment;
 import ua.knure.fb2reader.Views.Fragments.BookReadingFragment;
 import ua.knure.fb2reader.Views.Fragments.BookShelfFragment;
 import ua.knure.fb2reader.Views.Fragments.BookmarkAddDialogFragment;
+import ua.knure.fb2reader.Views.Fragments.BookmarksListFragment;
 import ua.knure.fb2reader.Views.Params;
 import ua.knure.fb2reader.dropbox.SyncService;
 
@@ -96,7 +97,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
             if (isLogined) {
                 selectItem(Params.MENU_BOOK_SHELF);
             } else {
-                selectItem(Params.MENU_APP_LOGIN);
+                //selectItem(Params.MENU_APP_LOGIN);
             }
         }
         startService(new Intent(this, SyncService.class));
@@ -167,9 +168,10 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
             case Params.MENU_BOOK_ADD_BOOKMARK:
                 addBookmarkDialog();
                 break;
-            case Params.MENU_BOOK_SEARCH:
-
-                break;
+            case Params.MENU_BOOK_BOOKMARKS:
+                fragment = BookmarksListFragment.newInstance(lastOpenedBook.getBookFullPathInStorage(), true);
+                arguments = fragment.getArguments();
+                break;/*
             case Params.MENU_APP_SETTINGS:
                 //fragment = SettingsFragment.newInstance("","");
                 break;
@@ -178,7 +180,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
                 break;
             case Params.MENU_APP_LOGIN:
                 //fragment = LoginFragment.newInstance("","");
-                break;
+                break;*/
             default:
                 break;
         }
@@ -292,7 +294,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
     }
 
     @Override
-    public void OnClosedBookInfoFragmentsEvent(Book book) {
+    public void OnClosedBookInfoFragmentsEvent() {
         SharedPreferences sdPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor ed = sdPref.edit();
         String[] filePath = lastOpenedBook.getBookFullPathInStorage().split("/");

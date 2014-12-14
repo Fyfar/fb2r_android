@@ -33,10 +33,10 @@ public class Params {
     public static final int MENU_BOOK_SHELF = 0;
     public static final int MENU_BOOK_INFO = 1;
     public static final int MENU_BOOK_ADD_BOOKMARK = 2;
-    public static final int MENU_BOOK_SEARCH = 3;
-    public static final int MENU_APP_STATISTICS = 4;
+    public static final int MENU_BOOK_BOOKMARKS = 3;
+   /* public static final int MENU_APP_STATISTICS = 4;
     public static final int MENU_APP_SETTINGS = 5;
-    public static final int MENU_APP_LOGIN = 6;
+    public static final int MENU_APP_LOGIN = 6;*/
 
     public static String[] MENU_TITLES = null;
 }
