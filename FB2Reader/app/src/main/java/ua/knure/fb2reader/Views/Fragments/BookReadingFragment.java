@@ -1,7 +1,9 @@
 package ua.knure.fb2reader.Views.Fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -13,10 +15,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Date;
 
 import ua.knure.fb2reader.Book.Book;
+import ua.knure.fb2reader.DataAccess.BookDAO;
 import ua.knure.fb2reader.DataAccess.DAO;
 import ua.knure.fb2reader.DataAccess.DataAccess;
 import ua.knure.fb2reader.R;
@@ -94,14 +98,28 @@ public class BookReadingFragment extends Fragment {
             @Override
             public void onPageSelected(int i) {
                 if (book != null) {
-                    onBookStatusChangedListener.onBookStatusChangedEvent(book);
+                    book.setCharsToLastPage((i + 1) * book.getCharsPerLine() * book.getLinesPerPage());
+
                     String email = PreferenceManager
                             .getDefaultSharedPreferences(ctx).getString("email", "");
                     String bookPath = PreferenceManager
                             .getDefaultSharedPreferences(ctx).getString("currentBook", "");
-                    Log.d("myLogs", "i = " + i + " lastChar = " + book.getCharsToLastPage() + "  "
-                            + bookPath + "email = " + email);
+
+                    SharedPreferences sdPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
+                    SharedPreferences.Editor ed = sdPref.edit();
+                    String[] filePath = book.getBookFullPathInStorage().split("/");
+                    Log.d("myLogs", "book = " + filePath[filePath.length - 1]);
+                    ed.putString("currentBook", filePath[filePath.length - 1]);
+                    ed.commit();
+                    BookDAO bookDAO = ViewUtils.getBookFromDB(filePath[filePath.length - 1], getActivity().getBaseContext());
+                    Log.d("myLogs", "book = " + bookDAO.getBookName() + " lastChar = " + bookDAO.getLastChar());
+
+                    if (bookDAO.getLastChar() < book.getCharsToLastPage()) {
+                        bookDAO.setLastChar(book.getCharsToLastPage());
+                    }
                     DAO.updateBook(DAO.BOOKS_TABLE, new Date(), book.getCharsToLastPage(), bookPath, email);
+
+                    onBookStatusChangedListener.onBookStatusChangedEvent(book);
                 }
             }
 
@@ -111,11 +129,12 @@ public class BookReadingFragment extends Fragment {
             }
 
         });
-        /*
-        * Отложенный запуск книги для того что бы перед тем как начать открывать книгу
-        * запустился активити с однотонным экраном для подсчета символов и строк что бы
-        * потом с данными настройками открыть саму книгу
-        * */
+
+        /**
+         * Отложенный запуск книги для того что бы перед тем как начать открывать книгу
+         * запустился активити с однотонным экраном для подсчета символов и строк что бы
+         * потом с данными настройками открыть саму книгу
+         * */
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -129,37 +148,43 @@ public class BookReadingFragment extends Fragment {
                 book = (Book) arguments.getSerializable(Params.ARG_SERIALIZED_BOOK);
 
                 if (book == null) {
-                    book = DataAccess.openBookFromDocument(DataAccess.openBookDocumentFromFile(bookPath), numberOfCharsPerLine, numberOfLinesPerScreen);
+                    book = DataAccess.openBookFromDocument(DataAccess.openBookDocumentFromFile(bookPath), numberOfCharsPerLine, numberOfLinesPerScreen, bookPath);
                 }
-                book.setBookFullPathInStorage(bookPath);
+                if (book != null) {
 
-                viewPagerAdapter = new BookPageFragmentPagerAdapter(getActivity().getSupportFragmentManager(), book);
-                viewPagerAdapter.notifyDataSetChanged();
-                int chars = book.getCharsToLastPage();
-                int lastPage = book.getNumberOfLastPage();
-                viewPager.setAdapter(viewPagerAdapter);
-                book.setCharsToLastPage(chars);
-                book.setNumberOfLastPage(lastPage + 1);
+                    viewPagerAdapter = new BookPageFragmentPagerAdapter(getActivity().getSupportFragmentManager(), book);
+                    viewPagerAdapter.notifyDataSetChanged();
 
-                String bookNameInActionBar;
-                try {
-                    bookNameInActionBar = book.getBookInfo().getBookName().get(0);
-                } catch (IndexOutOfBoundsException ex) {
-                    bookNameInActionBar = "...";
-                }
-                if (bookNameInActionBar != null) {
-                    getActivity().getActionBar().setTitle(bookNameInActionBar);
-                }
-                if (book.getNumberOfLastPage() > 0) {
-                    viewPager.setCurrentItem(book.getNumberOfLastPage());
-                }
+                    int chars = book.getCharsToLastPage();
+                    viewPager.setAdapter(viewPagerAdapter);
+                    book.setCharsToLastPage(chars);
 
-                onBookStatusChangedListener.onBookStatusChangedEvent(book);/* оповещаем главный активити о окрытой книге и передаем ему ссылку на нее*/
-                if (isOpeningInfo) {
-                    onInfoPageOpeningListener.onInfoPageOpeningEvent(isOpeningInfo, book);
-                    /*проверяем было ли открыто окно с информацией для данной книги если да то говорим
-                    * активити что нужно его открыть
-                    * */
+                    String bookNameInActionBar;
+                    try {
+                        bookNameInActionBar = book.getBookInfo().getBookName().get(0);
+                    } catch (IndexOutOfBoundsException ex) {
+                        bookNameInActionBar = "...";
+                    }
+                    if (bookNameInActionBar != null) {
+                        getActivity().getActionBar().setTitle(bookNameInActionBar);
+                    }
+
+                    if (book.getNumberOfLastPage() > 0 && book.getNumberOfLastPage() < book.getBookPages().size()) {
+                        viewPager.setCurrentItem(book.getNumberOfLastPage());
+                    }
+
+                    onBookStatusChangedListener.onBookStatusChangedEvent(book);/* оповещаем главный активити о окрытой книге и передаем ему ссылку на нее*/
+
+                    if (isOpeningInfo) {
+                        onInfoPageOpeningListener.onInfoPageOpeningEvent(isOpeningInfo, book);
+                    }
+                } else {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Error with opening a book");
+                    builder.setMessage("Book by path : " + bookPath + " cannot be opened");
+                    builder.setCancelable(true);
+                    builder.create().setCanceledOnTouchOutside(true);
+                    Toast.makeText(getActivity().getApplicationContext(), "Cannot open the book by path:\n" + bookPath, Toast.LENGTH_LONG);
                 }
             }
         }, 1000);

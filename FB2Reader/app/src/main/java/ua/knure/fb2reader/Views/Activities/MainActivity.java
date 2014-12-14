@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -208,8 +207,6 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
             setTitle(Params.MENU_TITLES[position]);
             mDrawerLayout.closeDrawer(mDrawerList);
         } else {
-            // Error
-            //Log.e(this.getClass().getName(), "Error. Fragment is not created");
         }
     }
 
@@ -238,6 +235,30 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
+    /**
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     * */
+
+
+
 
     /*
     * Ниже представлены реализации интерфейсов некоторых
@@ -251,70 +272,49 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         * здесь реализован интерфейс из фрагмента bookShelfFragment
         * данный код срабатывает когда мы во фрагменте выбираем файл(книжку)
         * */
-        Fragment fragment = BookReadingFragment.newInstance(bookPath);
-        if (fragment != null) {
-            fragment.getArguments().putBoolean(Params.ARG_BOOK_INFO_WAS_OPENED, true);
-            openFragment(fragment, Params.MENU_BOOK_SHELF, fragment.getArguments());
+        try {
+            Fragment fragment = BookReadingFragment.newInstance(bookPath);
+            if (fragment != null) {
+                fragment.getArguments().putBoolean(Params.ARG_BOOK_INFO_WAS_OPENED, true);
+                openFragment(fragment, Params.MENU_BOOK_SHELF, fragment.getArguments());
+            }
+        } catch (Exception ex) {
+            Toast.makeText(getApplicationContext(), "Cannot open the book by path:\n" + bookPath, Toast.LENGTH_LONG);
         }
     }
 
     @Override
     public void onInfoPageOpeningEvent(boolean firstOpening, Book book) {
-        /*
-        *  Здесь реализован интерфейс из фрагмента BookReadingFragment
-        *  данный код выполняется после того как книжка уже отпарсена и страницы построены
-        *  данный код откроет информацию о книге
-        * */
-
         Fragment fragment = BookInfoFragment.newInstance(book);
         if (fragment != null) {
             openFragment(fragment, Params.MENU_BOOK_SHELF, fragment.getArguments());
         }
-        lastOpenedBook = book;
     }
 
     @Override
     public void OnClosedBookInfoFragmentsEvent(Book book) {
-        /*
-        *  Здесь реализован интерфейс из фрагмента BookInfoFragment
-        *  данный код выполняется при нажатии кнопки "читать" во
-        *  фрагменте с информацией о книге
-        *  данный код открывает опять фрагмент с книжкой, только на этот
-        *  раз он уже возвращает открытую книжку, что бы она не парсилась заново.
-        * */
-
-        Fragment fragment = null;
-        int numberOfChars = book.getCharsToLastPage();
-        if (numberOfChars > 0) {
-            book.setNumberOfLastPage(numberOfChars / (book.getCharsPerLine() * book.getLinesPerPage()));
-            fragment = BookReadingFragment.newInstance(book);
-        } else {
-            fragment = BookReadingFragment.newInstance(book);
-        }
-
-        if (fragment != null) {
-            openFragment(fragment, Params.MENU_BOOK_SHELF, fragment.getArguments());
-        }
-        lastOpenedBook = book;
         SharedPreferences sdPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor ed = sdPref.edit();
-        String[] filePath = book.getBookFullPathInStorage().split("/");
-        Log.d("myLogs", "book = " + filePath[filePath.length - 1]);
+        String[] filePath = lastOpenedBook.getBookFullPathInStorage().split("/");
         ed.putString("currentBook", filePath[filePath.length - 1]);
         ed.commit();
         BookDAO bookDAO = ViewUtils.getBookFromDB(filePath[filePath.length - 1], getBaseContext());
-        Log.d("myLogs", "book = " + bookDAO.getBookName() + " lastChar = " + bookDAO.getLastChar());
+
+        Fragment fragment = null;
+        int numberOfChars = bookDAO.getLastChar();
+        if (numberOfChars > 0 && (numberOfChars / lastOpenedBook.getCharsPerLine() / lastOpenedBook.getLinesPerPage()) < lastOpenedBook.getBookPages().size()) {
+            if (lastOpenedBook.getCharsToLastPage() < numberOfChars) {
+                lastOpenedBook.setCharsToLastPage(numberOfChars);
+            }
+        }
+        fragment = BookReadingFragment.newInstance(lastOpenedBook);
+        if (fragment != null) {
+            openFragment(fragment, Params.MENU_BOOK_SHELF, fragment.getArguments());
+        }
     }
 
     @Override
     public void onBookStatusChangedEvent(Book book) {
-        /*
-        *  Здесь реализован интерфейс из фрагмента BookReadingFragment
-        *  данный код выполняется после парсинга книжки
-        *  данный код открывает присваивает локальной переменной
-        *  последнюю открытую книжку
-        * */
-
         lastOpenedBook = book;
     }
 
@@ -325,8 +325,8 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         String email = PreferenceManager.getDefaultSharedPreferences(getBaseContext())
                 .getString("email", "");
         DAO.addBookMark(email, name, text, page, charsCounter);
-        Log.d("myLogs", "[bookmarkName = " + name + " charsCounter = "
-                + charsCounter + " pageNumber = " + page + " text = " + text + "]");
+        //Log.d("myLogs", "[bookmarkName = " + name + " charsCounter = "
+        //        + charsCounter + " pageNumber = " + page + " text = " + text + "]");
     }
 
     /*

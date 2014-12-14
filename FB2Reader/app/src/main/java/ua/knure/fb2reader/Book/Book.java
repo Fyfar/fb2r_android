@@ -37,11 +37,12 @@ public class Book implements Serializable {
     private Bitmap bookCoverBitmap;
     private String bookFullPathInStorage;
 
-    public Book(Document bookDocument, int charactersPerLine, int linesPerPage, int numberOfLastPage, SyllablesPartitionable syllables) {//Parsed document(bookDocument)
+    public Book(Document bookDocument, int charactersPerLine, int linesPerPage, int numberOfLastPage, SyllablesPartitionable syllables, String bookFullPathInStorage) {//Parsed document(bookDocument)
         this.bookDocument = bookDocument;
         this.charactersPerLine = charactersPerLine;
         this.linesPerPage = linesPerPage;
         this.syllables = syllables;
+        this.bookFullPathInStorage = bookFullPathInStorage;
         if (numberOfLastPage >= 0) {
             this.numberOfLastPage = numberOfLastPage;
         }
@@ -128,9 +129,9 @@ public class Book implements Serializable {
         return bookFullPathInStorage;
     }
 
-    public void setBookFullPathInStorage(String bookFullPathInStorage) {
+    /*public void setBookFullPathInStorage(String bookFullPathInStorage) {
         this.bookFullPathInStorage = bookFullPathInStorage;
-    }
+    }*/
 
     public int getCharsToLastPage() {
         return charsToLastPage;

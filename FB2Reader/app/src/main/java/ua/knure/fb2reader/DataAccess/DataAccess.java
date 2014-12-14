@@ -63,10 +63,10 @@ public class DataAccess {
     * Метод который из отпарсенного документа создает книжку с нужными настройками
     * строк и символов
     * **/
-    public static Book openBookFromDocument(org.w3c.dom.Document doc, int lineLength, int linesPerScreen) {
+    public static Book openBookFromDocument(org.w3c.dom.Document doc, int lineLength, int linesPerScreen, String path) {
         Book book = null;
         try {
-            book = new Book(doc, lineLength, linesPerScreen, 0, new SimpleSyllables());
+            book = new Book(doc, lineLength, linesPerScreen, 0, new SimpleSyllables(), path);
             return book;
         } catch (Exception ex) {
             ex.printStackTrace();
