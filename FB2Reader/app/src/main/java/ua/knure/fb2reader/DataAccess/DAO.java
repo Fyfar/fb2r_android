@@ -53,8 +53,17 @@ public class DAO {
     private DBHelper mDBHelper;
     private static SQLiteDatabase db;
 
-    public DAO(Context ctx) {
+    private static DAO dao;
+
+    private DAO(Context ctx) {
         this.ctx = ctx;
+    }
+
+    public synchronized static DAO getInstance(Context ctx)  {
+        if(dao == null) {
+            dao = new DAO(ctx);
+        }
+        return dao;
     }
 
     public void open() {

@@ -31,14 +31,12 @@ public class SplashActivity extends Activity {
     private final static String APP_SECRET = "8jbe7gnyi4y9imt";
 
     private static DbxAccountManager mDbxAcctMgr;
-    private DAO dao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_layout);
 
-        dao = new DAO(getBaseContext());
 
         mDbxAcctMgr = DbxAccountManager.getInstance(getApplicationContext(),
                 APP_KEY, APP_SECRET);
@@ -63,7 +61,6 @@ public class SplashActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        dao.close();
     }
 
     public static DbxAccountManager getmDbxAcctMgr() {

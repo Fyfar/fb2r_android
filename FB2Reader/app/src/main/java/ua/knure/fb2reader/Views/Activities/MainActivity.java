@@ -48,6 +48,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
     private CharSequence mTitle;
     private Book lastOpenedBook;
     private boolean isLogined = true;
+    private DAO dao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +101,13 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
                 //selectItem(Params.MENU_APP_LOGIN);
             }
         }
-        startService(new Intent(this, SyncService.class));
+        dao = DAO.getInstance(getBaseContext());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                startService(new Intent(getBaseContext(), SyncService.class));
+            }
+        }).start();
     }
 
     @Override
@@ -141,6 +148,9 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
     @Override
     protected void onDestroy() {
         stopService(new Intent(this, SyncService.class));
+        if (dao.dbIsOpen()) {
+            dao.close();
+        }
         super.onDestroy();
     }
 

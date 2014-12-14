@@ -36,7 +36,7 @@ public class DropboxAuth extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register_layout);
-        dao = new DAO(this);
+        dao = DAO.getInstance(this);
         dao.open();
         mDbxAcctMgr = SplashActivity.getmDbxAcctMgr();
         if (!mDbxAcctMgr.hasLinkedAccount()) {
@@ -56,7 +56,7 @@ public class DropboxAuth extends Activity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         try {
-            Thread.sleep(3000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -89,7 +89,6 @@ public class DropboxAuth extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        dao.close();
     }
 
     public void onClickLinkToDropbox(View view) {

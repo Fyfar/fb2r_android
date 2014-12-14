@@ -79,15 +79,12 @@ public class SyncService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (dao.dbIsOpen()) {
-            dao.close();
-        }
     }
 
     private void initialize() throws InvalidPathException, IOException {
         mDbxAcctMgr = DbxAccountManager.getInstance(getApplicationContext(),
                 APP_KEY, APP_SECRET);
-        dao = new DAO(getBaseContext());
+        dao = DAO.getInstance(getBaseContext());
         dao.open();
         try {
             Log.d("myLogs", "dbFx init");
@@ -161,7 +158,7 @@ public class SyncService extends Service {
                 // Log.d("myLogs", " json = " + book.getBookName() + " " + book.getLastChar());
                 JSONObject json = new JSONObject(responseBody);
                 Log.d("myLogs", " json = " + book.getBookName() + " " + book.getLastChar() + " " + json.toString());
-                Log.d("myLogs", "status = " + json.getString("status"));
+               // Log.d("myLogs", "status = " + json.getString("status"));
                 JSONArray arr = json.getJSONArray("books");
                 dao.updateBooks(arr, email);
             } else
