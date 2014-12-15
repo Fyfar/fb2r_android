@@ -173,10 +173,10 @@ public class SyncService extends Service {
         email = PreferenceManager
                 .getDefaultSharedPreferences(getBaseContext()).getString("email", null);
         PathListener.addBooksToDB(dao, email);
-        tC = new Timer();
-        startTimers();
         PathListener.downloadFiles(dbxFs, new DbxPath("/"));
         PathListener.uploadFiles(dbxFs);
+        tC = new Timer();
+        startTimers();
         dbxFs.addPathListener(new PathListener(), new DbxPath("/"),
                 DbxFileSystem.PathListener.Mode.PATH_OR_DESCENDANT);
     }
@@ -306,11 +306,6 @@ public class SyncService extends Service {
             List<BookBookmark> bookmarks = DAO.getAllBookmarks(email);
             for (BookBookmark bookmark : bookmarks) {
                 postBookMarks(bookmark);
-            }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
             String res = GET(URL + "/bookmark");
             addBooksToDB(res);

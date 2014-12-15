@@ -7,6 +7,7 @@ import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -151,6 +152,8 @@ public class DAO {
         BookDAO book = new BookDAO();
         int userId = getUserId(email);
         Cursor all = getAllData(BOOKS_TABLE);
+        Log.d("myLogs", email);
+        Log.d("myLogs", "bookName = " + bookName);
         if (all.moveToFirst()) {
             do {
                 if (all.getInt(all.getColumnIndex(USER_ID)) == userId
@@ -167,6 +170,9 @@ public class DAO {
     }
 
     public static List<BookBookmark> getAllBookmarks(String email) {
+        if(!dbIsOpen()) {
+            return new ArrayList<>();
+        }
         Cursor all = getAllData(BOOKMARKS_TABLE);
         List<BookBookmark> bookmarks = new ArrayList<>();
         if (all.moveToFirst()) {
@@ -264,6 +270,9 @@ public class DAO {
     }
 
     public static void updateBooks(JSONArray arr, String email) {
+        if(!dbIsOpen()) {
+            return;
+        }
         try {
             for (int i = 0; i < arr.length(); i++) {
                 updateBook(BOOKS_TABLE, new Date()
@@ -276,6 +285,9 @@ public class DAO {
     }
 
     public static void updateBookmarks(JSONArray arr, String email) {
+        if(!dbIsOpen()) {
+            return;
+        }
         try {
             for (int i = 0; i < arr.length(); i++) {
                 if (!checkRec(arr.getJSONObject(i).getString("name"), BOOKMARKS_TABLE, BOOKMARK_NAME)) {

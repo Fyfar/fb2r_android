@@ -310,7 +310,7 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         BookDAO bookDAO = ViewUtils.getBookFromDB(filePath[filePath.length - 1], getBaseContext());
 
         Fragment fragment = null;
-        int numberOfChars = bookDAO.getLastChar();
+        int numberOfChars = bookDAO == null ? 0 : bookDAO.getLastChar();
         if (numberOfChars > 0 && (numberOfChars / lastOpenedBook.getCharsPerLine() / lastOpenedBook.getLinesPerPage()) < lastOpenedBook.getBookPages().size()) {
             if (lastOpenedBook.getCharsToLastPage() < numberOfChars) {
                 lastOpenedBook.setCharsToLastPage(numberOfChars);
