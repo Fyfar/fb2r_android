@@ -1,7 +1,10 @@
 package ua.knure.fb2reader.dropbox;
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -229,6 +232,16 @@ public class SyncService extends Service {
             e.printStackTrace();
         }
 
+    }
+
+
+    public boolean isConnected() {
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected())
+            return true;
+        else
+            return false;
     }
 
     public void postBookMarks(BookBookmark bookmark) {

@@ -33,6 +33,5 @@ dependencies {
     compile "com.android.support:appcompat-v7:19.0.+"
     compile files('jniLibs/dropbox-sync-sdk-android.jar')
     compile files('jniLibs/lib.jar')
-    compile project(':vksdk_library')
 
 }
