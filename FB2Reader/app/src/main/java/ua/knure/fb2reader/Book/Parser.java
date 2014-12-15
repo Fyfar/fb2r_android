@@ -10,9 +10,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-/**
- * Created by Александр on 28.10.2014.
- */
 public class Parser {
     public static org.w3c.dom.Document getParsedBook(File currentFile)
             throws ParserConfigurationException, SAXException, IOException {

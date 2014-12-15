@@ -13,17 +13,16 @@ import ua.knure.fb2reader.R;
 import ua.knure.fb2reader.Views.Activities.MainActivity;
 import ua.knure.fb2reader.dropbox.DropboxAuth;
 
-/**
- * Created by evilcorp on 20.11.14.
- */
 public class SplashActivity extends Activity {
-
-    private SharedPreferences sdPref;
 
     private final static String APP_KEY = "ygam033j049nurm";
     private final static String APP_SECRET = "8jbe7gnyi4y9imt";
-
     private static DbxAccountManager mDbxAcctMgr;
+    private SharedPreferences sdPref;
+
+    public static DbxAccountManager getmDbxAcctMgr() {
+        return mDbxAcctMgr;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +52,5 @@ public class SplashActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-    }
-
-    public static DbxAccountManager getmDbxAcctMgr() {
-        return mDbxAcctMgr;
     }
 }

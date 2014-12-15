@@ -14,10 +14,10 @@ import com.dropbox.sync.android.DbxAccountManager;
 
 import org.json.JSONException;
 
+import ua.knure.fb2reader.DataAccess.DAO;
 import ua.knure.fb2reader.R;
 import ua.knure.fb2reader.Utils.ViewUtils;
 import ua.knure.fb2reader.Views.Activities.MainActivity;
-import ua.knure.fb2reader.DataAccess.DAO;
 import ua.knure.fb2reader.Views.SplashActivity;
 
 public class DropboxAuth extends Activity {
@@ -93,14 +93,4 @@ public class DropboxAuth extends Activity {
             mDbxAcctMgr.startLink(this, REQUEST_LINK_TO_DBX);
         }
     }
-
-  /*  public static boolean isLinked(Context context) {
-        mDbxAcctMgr = DbxAccountManager.getInstance(this,
-                APP_KEY, APP_SECRET);
-        if (mDbxAcctMgr.hasLinkedAccount()) {
-            return true;
-        }
-        return false;
-    }*/
-
 }

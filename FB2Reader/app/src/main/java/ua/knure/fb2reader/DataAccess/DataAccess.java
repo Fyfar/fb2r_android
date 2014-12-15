@@ -10,9 +10,6 @@ import ua.knure.fb2reader.Book.Book;
 import ua.knure.fb2reader.Book.Parser;
 import ua.knure.fb2reader.Book.SimpleSyllables;
 
-/**
- * Created by Александр on 28.10.2014.
- */
 public class DataAccess {
     public static File STANDART_BOOK_FOLDER_DIRECTORY = new File(Environment.getExternalStorageDirectory() + "/CloudReader");
     public static File STANDART_BOOK_SETTINGS_FOLDER_DIRECTORY = new File(Environment.getExternalStorageDirectory() + "/CloudReader/.settings");
@@ -26,11 +23,6 @@ public class DataAccess {
         return file;
     }
 
-    /*
-    * Метод ищет все книжки в переданном в него пути
-    * фактически его нужно будет переписать без параметров для поиска только
-    * стандартной папке нашего приложения
-    * **/
     public static List<File> getAllFilesInBooksFolder(File dir) {
         bookList = new ArrayList<>();
 
@@ -44,9 +36,6 @@ public class DataAccess {
         return bookList;
     }
 
-    /*
-    * Метод который открывает книжку и возвращает уже отпарсенный вариант документа
-    * **/
     public static org.w3c.dom.Document openBookDocumentFromFile(String path) {
         File currentBook = DataAccess.openBook(path);
         org.w3c.dom.Document doc = null;
@@ -59,10 +48,6 @@ public class DataAccess {
         return doc;
     }
 
-    /*
-    * Метод который из отпарсенного документа создает книжку с нужными настройками
-    * строк и символов
-    * **/
     public static Book openBookFromDocument(org.w3c.dom.Document doc, int lineLength, int linesPerScreen, String path) {
         Book book = null;
         try {

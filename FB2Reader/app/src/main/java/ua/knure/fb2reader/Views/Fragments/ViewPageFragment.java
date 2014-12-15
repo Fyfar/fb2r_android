@@ -18,13 +18,6 @@ import ua.knure.fb2reader.R;
 import ua.knure.fb2reader.Utils.ViewUtils;
 import ua.knure.fb2reader.Views.Params;
 
-/**
- * Created by Александр on 15.11.2014.
- */
-/*
-* Этот фрагмент отвечает за отображение страниц во viewPager'е. Здесь
-* описана логика создания страниц самой книги в TextView
-* */
 public class ViewPageFragment extends Fragment {
     private List<String> bookPages;
     private int textSize;
@@ -52,11 +45,8 @@ public class ViewPageFragment extends Fragment {
         arguments.putInt(Params.ARG_CHARS_PER_LINE, book.getCharsPerLine());
         arguments.putStringArrayList(Params.ARG_PAGE_TEXT, (ArrayList<String>) pages.get(position).getLinesOnThePage());
 
-        /***************************************************************/
         int chars = ViewUtils.getCharsToCurrentPosition(book, position);
         book.setCharsToLastPage(chars);
-        /***************************************************************/
-
 
         viewPageFragment.setArguments(arguments);
         return viewPageFragment;
@@ -72,13 +62,9 @@ public class ViewPageFragment extends Fragment {
         arguments.putInt(Params.ARG_BACKGROUND_COLOR, backgroundColor);
         arguments.putStringArrayList(Params.ARG_PAGE_TEXT, (ArrayList<String>) pages.get(position).getLinesOnThePage());
 
-
-        /***************************************************************/
         int chars = ViewUtils.getCharsToCurrentPosition(book, position);
         book.setCharsToLastPage(chars);
         book.setNumberOfLastPage(chars / (book.getCharsPerLine() * book.getLinesPerPage()));
-        /***************************************************************/
-
 
         viewPageFragment.setArguments(arguments);
         return viewPageFragment;

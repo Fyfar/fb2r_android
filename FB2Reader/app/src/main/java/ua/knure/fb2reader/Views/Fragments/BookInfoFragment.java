@@ -19,28 +19,16 @@ import ua.knure.fb2reader.Book.Book;
 import ua.knure.fb2reader.R;
 import ua.knure.fb2reader.Views.Params;
 
-/*
-* Фрагмент для отображение инфы о книге
-*
-* */
 public class BookInfoFragment extends Fragment {
     private Book book;
     private BookInfoListAdapter arrayAdapter;
     private List<String> headers;
     private List<String> texts;
-
     private OnClosedBookInfoFragmentListener onClosedBookInfoFragmentListener;
 
-    /*
-    * Конструктор должен быть обязательно пустой для правильной
-    * инициализации фрагмента при каждом его создании
-    * */
     public BookInfoFragment() {
     }
 
-    /* Метод-фабрика который будет создавать фрагмент с переданными в него
-     * параметрами (в данном случае мы кладем туда книжку)
-     * */
     public static BookInfoFragment newInstance(Book book) {
         BookInfoFragment fragment = new BookInfoFragment();
         Bundle arguments = new Bundle();
@@ -57,9 +45,6 @@ public class BookInfoFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-    /*
-    * Грубо говоря здесь все заполнения нашего фрагмента информацией из переданной книги
-    * */
         TextView myTextView = (TextView) view.findViewById(R.id.textView_book_info);
         Bundle arguments = getArguments();
         book = (Book) arguments.getSerializable(Params.ARG_SERIALIZED_BOOK);
@@ -67,7 +52,7 @@ public class BookInfoFragment extends Fragment {
         texts = new ArrayList<>();
 
         if (book != null && myTextView != null) {
-            Bitmap bitmapDrawable = book.getBookCover(); /* обложка книги */
+            Bitmap bitmapDrawable = book.getBookCover();
 
             StringBuilder temp = new StringBuilder();
 
@@ -128,17 +113,11 @@ public class BookInfoFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 onClosedBookInfoFragmentListener.OnClosedBookInfoFragmentsEvent();
-                /*передача управления главному активити
-                открытие окна для чтения книги*/
             }
         });
         getActivity().getActionBar().setTitle(Params.MENU_TITLES[Params.MENU_BOOK_INFO]);
     }
 
-    /*
-    * Метод возвращает строчку с текстом полученную из нескольких строк связанных
-    * с данным итератором
-    * */
     private String getInfoFromIterator(Iterator<String> iterator) {
         StringBuilder builder = new StringBuilder();
         builder.append("");
@@ -160,10 +139,6 @@ public class BookInfoFragment extends Fragment {
         return builder.toString();
     }
 
-    /*
-    * данный метод нужен для того что бы привязать главное активити (создание слушателя)
-    * для последующей обработки события в главном активити
-    * */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -174,9 +149,6 @@ public class BookInfoFragment extends Fragment {
         }
     }
 
-    /*
-    * интерфейс для того что бы вернуться на фрагмент чтения книги
-    * */
     public interface OnClosedBookInfoFragmentListener {
         public void OnClosedBookInfoFragmentsEvent();
     }

@@ -24,16 +24,13 @@ import ua.knure.fb2reader.DataAccess.DAO;
  * Created by Александр on 30.11.2014.
  */
 public class ViewUtils {
-    /*
-    * Метод нужен для того что бы в октрытом! текствью получить количество
-    * символов в строчке
-    * */
+
     public static int getNumberOfCharsPerLine(TextView view) {
         if (view == null) {
             return 0;
         }
         StringBuilder text = new StringBuilder();
-        for (int i = 0; i < 20000; i++){
+        for (int i = 0; i < 20000; i++) {
             text.append("W");
         }
         int textViewWidth = view.getWidth();
@@ -48,9 +45,6 @@ public class ViewUtils {
         return charCount;
     }
 
-    /*
-    * Возвращает количество символов до данной открытой страницы
-    * */
     public static int getCharsToCurrentPosition(Book book, int position) {
         int count = 0;
         for (int i = 0; i < position; i++) {
@@ -59,10 +53,6 @@ public class ViewUtils {
         return count;
     }
 
-    /*
-    * Метод нужен для того что бы в октрытом! текствью получить количество
-    * строк в экране
-    * */
     public static int getNumberOfLinesPerScreen(TextView view) {
         if (view == null) {
             return 0;
@@ -71,7 +61,7 @@ public class ViewUtils {
         return linesPerScreen;
     }
 
-    public static String md5 (String input) {
+    public static String md5(String input) {
         MessageDigest m = null;
         try {
             m = MessageDigest.getInstance("MD5");
@@ -81,18 +71,14 @@ public class ViewUtils {
         m.reset();
         m.update(input.getBytes());
         byte[] digest = m.digest();
-        BigInteger bigInt = new BigInteger(1,digest);
+        BigInteger bigInt = new BigInteger(1, digest);
         String hashtext = bigInt.toString(16);
-        while(hashtext.length() < 32 ){
-            hashtext = "0"+hashtext;
+        while (hashtext.length() < 32) {
+            hashtext = "0" + hashtext;
         }
         return hashtext;
     }
 
-    //BookName means name of the file (not the path but name of the file)
-    // Example - path = d:/folder/some.file bookName = some.file
-    //ctx - you must give method something like getBaseContext or link to the activity from which
-    //you call this method
     public static BookDAO getBookFromDB(String bookName, Context ctx) {
         String email = PreferenceManager.getDefaultSharedPreferences(ctx).getString("email", "");
         return DAO.getBook(email, bookName);
@@ -112,7 +98,7 @@ public class ViewUtils {
         rawJson.setAccessible(true);
         JSONObject json = null;
         try {
-            json = new JSONObject((String)rawJson.get(info));
+            json = new JSONObject((String) rawJson.get(info));
         } catch (IllegalAccessException | IllegalArgumentException | JSONException e2) {
             e2.printStackTrace();
         }

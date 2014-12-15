@@ -13,17 +13,6 @@ import java.util.List;
 
 import ua.knure.fb2reader.R;
 
-/**
- * Created by Александр on 10.12.2014.
- */
-
-/*
-* Адаптер для списка во фрагменте информации о книге
-* Состоит из итемов которые имею структуру (текстВью, ИмейджВью, ТекстВью)
-* где первый текствью - это заголовок
-* второй - описание
-* ИмейджВью показывается только в первом элементе и только при наличии картинки
-* */
 public class BookInfoListAdapter extends BaseAdapter {
     private static LayoutInflater inflater = null;
     Context context;

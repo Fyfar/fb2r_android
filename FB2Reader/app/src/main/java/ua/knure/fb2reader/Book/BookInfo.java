@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Created by Александр on 28.10.2014.
- */
 public class BookInfo {
     private List<String> authors;
     private List<String> genre;

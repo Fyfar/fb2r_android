@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,21 +15,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import ua.knure.fb2reader.Book.Book;
 import ua.knure.fb2reader.Book.BookBookmark;
-import ua.knure.fb2reader.Book.BookInfo;
 import ua.knure.fb2reader.DataAccess.DAO;
 import ua.knure.fb2reader.R;
 import ua.knure.fb2reader.Views.Params;
 
-/*
-* Фрагмент для отображение инфы о книге
-*
-* */
 public class BookmarksListFragment extends Fragment {
     private static final String ARG_FOR_ALL_BOOKMARKS = "arg_for_all_bookmarks";
-
-    //private Book book;
     private BookInfoListAdapter arrayAdapter;
     private List<String> headers;
     private List<String> texts;
@@ -40,17 +31,6 @@ public class BookmarksListFragment extends Fragment {
     public BookmarksListFragment() {
     }
 
-
-    /*public static BookmarksListFragment newInstance(Book book, boolean forAllBook) {
-        BookmarksListFragment fragment = new BookmarksListFragment();
-        Bundle arguments = new Bundle();
-
-        arguments.putSerializable(Params.ARG_SERIALIZED_BOOK, book);
-        arguments.putBoolean(ARG_FOR_ALL_BOOKMARKS, forAllBook);
-
-        fragment.setArguments(arguments);
-        return fragment;
-    }*/
     public static BookmarksListFragment newInstance(String bookPath, boolean forAllBook) {
         BookmarksListFragment fragment = new BookmarksListFragment();
         Bundle arguments = new Bundle();
@@ -77,10 +57,9 @@ public class BookmarksListFragment extends Fragment {
         headers = new ArrayList<>();
         texts = new ArrayList<>();
         String path = arguments.getString(Params.ARG_BOOK_PATH);
-        if (path!=null){
+        if (path != null) {
             String email = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext())
                     .getString("email", "");
-            Log.d("myLogs", email);
             Iterator<BookBookmark> iterator = DAO.getAllBookmarks(email).iterator();
 
             while (iterator.hasNext() && forAllBookmarks) {

@@ -12,9 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-/**
- * Created by Александр on 29.10.2014.
- */
 public class BookPageBuilder {
     private static final int WHITE_SPACE = 1;
     private final String WITHOUT_TITLE = null;
@@ -74,7 +71,7 @@ public class BookPageBuilder {
                     String currentTitleString = title[i];
                     if (currentTitleString.length() < linesLength) {
                         StringBuilder sb = new StringBuilder();
-                        int center = (linesLength - currentTitleString.length())/2;
+                        int center = (linesLength - currentTitleString.length()) / 2;
                         for (int k = 0; k < center; k++) {
                             sb.append(" ");
                         }

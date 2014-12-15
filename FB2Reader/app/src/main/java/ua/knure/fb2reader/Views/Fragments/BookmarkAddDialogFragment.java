@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +17,6 @@ import ua.knure.fb2reader.Book.Book;
 import ua.knure.fb2reader.R;
 import ua.knure.fb2reader.Views.Params;
 
-/**
- * Created by Александр on 10.12.2014.
- */
 public class BookmarkAddDialogFragment extends DialogFragment {
     private static final String ARG_PAGE = "arg_page";
     private static final String ARG_CHARS = "arg_chars";
@@ -62,11 +58,9 @@ public class BookmarkAddDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
         View v = inflater.inflate(R.layout.bookmark_dialog_layout, null);
-
         Bundle arguments = getArguments();
 
         Book book = (Book) arguments.getSerializable(Params.ARG_SERIALIZED_BOOK);
@@ -84,15 +78,10 @@ public class BookmarkAddDialogFragment extends DialogFragment {
         textBookmark = (EditText) v.findViewById(R.id.book_page_text_for_edittext);
         nameBookmark = (EditText) v.findViewById(R.id.bookmark_name_edittext);
 
-        //textBookmark.setText(text);
         textBookmark.append(text);
 
-
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the dialog layout
         builder.setView(v)
                 .setTitle("Bookmark")
-                // Add action buttons
                 .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {

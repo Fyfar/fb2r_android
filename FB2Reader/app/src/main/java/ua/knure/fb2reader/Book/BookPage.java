@@ -3,9 +3,6 @@ package ua.knure.fb2reader.Book;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Александр on 28.10.2014.
- */
 public class BookPage {
     private List<String> linesOnThePage;
     private int numberOfLines;

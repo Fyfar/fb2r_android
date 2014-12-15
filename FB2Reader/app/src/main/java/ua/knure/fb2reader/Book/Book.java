@@ -1,7 +1,6 @@
 package ua.knure.fb2reader.Book;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -13,22 +12,12 @@ import java.util.List;
 
 import ua.knure.fb2reader.DataAccess.ImageUtils;
 
-
-/**
- * Created by Александр on 28.10.2014.
- */
-
-/*
-* Книга. Описывать смысла нету. Все что скажу, это то что для того что бы ее возможно было
-* передавать в Bundle, пришлось добавить сериализацию (кроме implements Serializable слава Богу
-* ничего больше не понадобилось =) )
-* */
 public class Book implements Serializable {
     private Document bookDocument;
     private BookInfo bookInfo;
     private List<BookPage> bookPages;
     private List<BookBookmark> bookmarks;
-    private int numberOfLastPage; /* пока что нигде не используется потому что не реализовано сохранение прогресса*/
+    private int numberOfLastPage;
     private int numberOfPages;
     private int charsToLastPage;
     private int charactersPerLine;
@@ -113,8 +102,8 @@ public class Book implements Serializable {
     }
 
     public int getNumberOfLastPage() {
-        if (numberOfLastPage == 0 && charsToLastPage>0){
-            numberOfLastPage = charsToLastPage/(charactersPerLine*linesPerPage);
+        if (numberOfLastPage == 0 && charsToLastPage > 0) {
+            numberOfLastPage = charsToLastPage / (charactersPerLine * linesPerPage);
         }
         return numberOfLastPage - 1;
     }
@@ -129,24 +118,21 @@ public class Book implements Serializable {
         return bookFullPathInStorage;
     }
 
-    /*public void setBookFullPathInStorage(String bookFullPathInStorage) {
-        this.bookFullPathInStorage = bookFullPathInStorage;
-    }*/
-
     public int getCharsToLastPage() {
         return charsToLastPage;
     }
 
     public void setCharsToLastPage(int charsNumber) {
         charsToLastPage = charsNumber;
-        setNumberOfLastPage(charsNumber/(charactersPerLine*linesPerPage));
+        setNumberOfLastPage(charsNumber / (charactersPerLine * linesPerPage));
     }
 
-    public void addBookmark(int pageNumber, int charsCounter, String text, String name){
+    public void addBookmark(int pageNumber, int charsCounter, String text, String name) {
         BookBookmark b = new BookBookmark(pageNumber, charsCounter, text, name);
         bookmarks.add(b);
     }
-    public List<BookBookmark> getBookmarks(){
+
+    public List<BookBookmark> getBookmarks() {
         return bookmarks;
     }
 }

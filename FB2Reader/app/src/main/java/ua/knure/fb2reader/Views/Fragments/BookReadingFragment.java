@@ -10,7 +10,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,9 +26,6 @@ import ua.knure.fb2reader.R;
 import ua.knure.fb2reader.Utils.ViewUtils;
 import ua.knure.fb2reader.Views.Params;
 
-/*
-* В этом фрагменте отображается открытая книжка
-* */
 public class BookReadingFragment extends Fragment {
     private int numberOfCharsPerLine;
     private int numberOfLinesPerScreen;
@@ -38,23 +34,13 @@ public class BookReadingFragment extends Fragment {
     private Book book;
     private Context ctx;
 
-    /* Интерфейсы которые должны быть реализованы в предке(того кто содержит, а не того кого наследует)
-     * данного фрагмента (главное активити)
-     * */
+
     private OnInfoPageOpeningListener onInfoPageOpeningListener;
     private OnBookStatusChangedListener onBookStatusChangedListener;
-    private OnSearchListener onSearchListener;
 
-    /*
-    * Конструктор должен быть обязательно пустой для правильной
-    * инициализации фрагмента при каждом его создании
-    * */
     public BookReadingFragment() {
     }
 
-    /* Метод-фабрика который будет создавать фрагмент с переданными в него
-    *  параметрами (в данном случае мы кладем туда путь к книге)
-    * */
     public static BookReadingFragment newInstance(String bookPath) {
         BookReadingFragment fragment = new BookReadingFragment();
         Bundle arguments = new Bundle();
@@ -64,9 +50,6 @@ public class BookReadingFragment extends Fragment {
         return fragment;
     }
 
-    /* Метод-фабрика который будет создавать фрагмент с переданными в него
-    *  параметрами (в данном случае мы кладем туда открытую книгу)
-    * */
     public static BookReadingFragment newInstance(Book book) {
         BookReadingFragment fragment = new BookReadingFragment();
         Bundle arguments = new Bundle();
@@ -108,17 +91,13 @@ public class BookReadingFragment extends Fragment {
                     SharedPreferences sdPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
                     SharedPreferences.Editor ed = sdPref.edit();
                     String[] filePath = book.getBookFullPathInStorage().split("/");
-                    Log.d("myLogs", "book = " + filePath[filePath.length - 1]);
                     ed.putString("currentBook", filePath[filePath.length - 1]);
                     ed.commit();
                     BookDAO bookDAO = ViewUtils.getBookFromDB(filePath[filePath.length - 1], getActivity().getBaseContext());
-                    Log.d("myLogs", "book = " + bookDAO.getBookName() + " lastChar = " + bookDAO.getLastChar());
-
-                    if (bookDAO.getLastChar() < book.getCharsToLastPage()) {
+                    if (bookDAO != null && bookDAO.getLastChar() < book.getCharsToLastPage()) {
                         bookDAO.setLastChar(book.getCharsToLastPage());
                     }
                     DAO.updateBook(DAO.BOOKS_TABLE, new Date(), book.getCharsToLastPage(), bookPath, email);
-
                     onBookStatusChangedListener.onBookStatusChangedEvent(book);
                 }
             }
@@ -130,18 +109,13 @@ public class BookReadingFragment extends Fragment {
 
         });
 
-        /**
-         * Отложенный запуск книги для того что бы перед тем как начать открывать книгу
-         * запустился активити с однотонным экраном для подсчета символов и строк что бы
-         * потом с данными настройками открыть саму книгу
-         * */
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 TextView view = (TextView) getView().findViewById(R.id.text_view_fragment);
                 numberOfCharsPerLine = ViewUtils.getNumberOfCharsPerLine(view);
                 numberOfLinesPerScreen = ViewUtils.getNumberOfLinesPerScreen(view);
-                Bundle arguments = getArguments(); /* получения переданных аргументов с активити **/
+                Bundle arguments = getArguments();
 
                 String bookPath = arguments.getString(Params.ARG_BOOK_PATH);
                 boolean isOpeningInfo = arguments.getBoolean(Params.ARG_BOOK_INFO_WAS_OPENED);
@@ -190,10 +164,6 @@ public class BookReadingFragment extends Fragment {
         }, 1000);
     }
 
-    /*
-    * данный метод нужен для того что бы привязать главное активити (создание слушателя)
-    * для последующей обработки события в главном активити
-    * */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -205,19 +175,11 @@ public class BookReadingFragment extends Fragment {
         }
     }
 
-    /*
-    * см. описания в главном активити
-    * */
     public interface OnInfoPageOpeningListener {
         public void onInfoPageOpeningEvent(boolean firstOpening, Book book);
     }
 
     public interface OnBookStatusChangedListener {
         public void onBookStatusChangedEvent(Book book);
-    }
-
-    public interface OnSearchListener {
-        public int onSearchEvent(String pattern);
-        /*нужен будет для создания поиска по книге*/
     }
 }

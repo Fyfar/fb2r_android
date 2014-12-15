@@ -3,17 +3,9 @@ package ua.knure.fb2reader.Views.Fragments;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.util.Log;
-
-import java.util.Date;
 
 import ua.knure.fb2reader.Book.Book;
-import ua.knure.fb2reader.Book.BookPage;
-import ua.knure.fb2reader.DataAccess.DAO;
 
-/**
- * Created by Александр on 09.12.2014.
- */
 public class BookPageFragmentPagerAdapter extends FragmentStatePagerAdapter {
     private final int numberOfDefaultPage = 1;
     private Book book;

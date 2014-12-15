@@ -7,7 +7,6 @@ import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -152,8 +151,7 @@ public class DAO {
         BookDAO book = new BookDAO();
         int userId = getUserId(email);
         Cursor all = getAllData(BOOKS_TABLE);
-        Log.d("myLogs", email);
-        Log.d("myLogs", "bookName = " + bookName);
+
         if (all.moveToFirst()) {
             do {
                 if (all.getInt(all.getColumnIndex(USER_ID)) == userId
@@ -170,7 +168,7 @@ public class DAO {
     }
 
     public static List<BookBookmark> getAllBookmarks(String email) {
-        if(!dbIsOpen()) {
+        if (!dbIsOpen()) {
             return new ArrayList<>();
         }
         Cursor all = getAllData(BOOKMARKS_TABLE);
@@ -223,6 +221,50 @@ public class DAO {
         return id;
     }
 
+    public static boolean dbIsOpen() {
+        return db.isOpen();
+    }
+
+    public static void updateBooks(JSONArray arr, String email) {
+        if (!dbIsOpen()) {
+            return;
+        }
+        try {
+            for (int i = 0; i < arr.length(); i++) {
+                updateBook(BOOKS_TABLE, new Date()
+                        , (Integer) ((JSONObject) arr.get(i)).get("lastChar")
+                        , String.valueOf(((JSONObject) arr.get(i)).get("name")), email);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void updateBookmarks(JSONArray arr, String email) {
+        if (!dbIsOpen()) {
+            return;
+        }
+        try {
+            for (int i = 0; i < arr.length(); i++) {
+                if (!checkRec(arr.getJSONObject(i).getString("name"), BOOKMARKS_TABLE, BOOKMARK_NAME)) {
+                    addBookmark(email, arr.getJSONObject(i).getString("name")
+                            , arr.getJSONObject(i).getString("text")
+                            , arr.getJSONObject(i).getInt("pageNumber")
+                            , arr.getJSONObject(i).getInt("lastChar")
+                            , arr.getJSONObject(i).getString("bookName"));
+                } else {
+                    updateBookmark(arr.getJSONObject(i).getInt("lastChar")
+                            , arr.getJSONObject(i).getString("bookName")
+                            , arr.getJSONObject(i).getString("name")
+                            , arr.getJSONObject(i).getString("text"), email
+                            , arr.getJSONObject(i).getInt("pageNumber"));
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void open() {
         mDBHelper = new DBHelper(ctx, DB_NAME, null, DB_VERSION, null);
         db = mDBHelper.getWritableDatabase();
@@ -232,10 +274,6 @@ public class DAO {
         if (mDBHelper != null) {
             mDBHelper.close();
         }
-    }
-
-    public static boolean dbIsOpen() {
-        return db.isOpen();
     }
 
     public void clearTable(String table) {
@@ -266,46 +304,6 @@ public class DAO {
             cv.put(DATETIME, 0);
             cv.put(LAST_CHAR, 0);
             db.insert(BOOKS_TABLE, null, cv);
-        }
-    }
-
-    public static void updateBooks(JSONArray arr, String email) {
-        if(!dbIsOpen()) {
-            return;
-        }
-        try {
-            for (int i = 0; i < arr.length(); i++) {
-                updateBook(BOOKS_TABLE, new Date()
-                        , (Integer) ((JSONObject) arr.get(i)).get("lastChar")
-                        , String.valueOf(((JSONObject) arr.get(i)).get("name")), email);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void updateBookmarks(JSONArray arr, String email) {
-        if(!dbIsOpen()) {
-            return;
-        }
-        try {
-            for (int i = 0; i < arr.length(); i++) {
-                if (!checkRec(arr.getJSONObject(i).getString("name"), BOOKMARKS_TABLE, BOOKMARK_NAME)) {
-                    addBookmark(email, arr.getJSONObject(i).getString("name")
-                            , arr.getJSONObject(i).getString("text")
-                            , arr.getJSONObject(i).getInt("pageNumber")
-                            , arr.getJSONObject(i).getInt("lastChar")
-                            , arr.getJSONObject(i).getString("bookName"));
-                } else  {
-                    updateBookmark(arr.getJSONObject(i).getInt("lastChar")
-                            , arr.getJSONObject(i).getString("bookName")
-                            , arr.getJSONObject(i).getString("name")
-                            , arr.getJSONObject(i).getString("text"), email
-                            ,  arr.getJSONObject(i).getInt("pageNumber"));
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
     }
 

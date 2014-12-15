@@ -1,8 +1,5 @@
 package ua.knure.fb2reader.Book;
 
-/**
- * Created by Александр on 10.12.2014.
- */
 public class BookBookmark {
     private int pageNumber;
     private int charsCounter;

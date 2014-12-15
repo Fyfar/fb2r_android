@@ -18,24 +18,16 @@ import ua.knure.fb2reader.DataAccess.DataAccess;
 import ua.knure.fb2reader.R;
 import ua.knure.fb2reader.Views.Params;
 
-/*фрагмент для отображения списка книг в папке приложения
-* */
 public class BookShelfFragment extends Fragment {
 
     private ArrayAdapter arrayAdapter;
-    private List<String> fileNamesList;/* Здесь будут хранится имена файлов для отображения*/
-    private List<String> filePathesList;/* Здесь будут хранится полные пути соответствующие именам файлов*/
+    private List<String> fileNamesList;
+    private List<String> filePathesList;
     private OnBookSelectedInShelfListener onBookSelectedInShelfListener;
 
-    /*
-    * Конструктор должен быть обязательно пустой для правильной
-    * инициализации фрагмента при каждом его создании
-    * */
     public BookShelfFragment() {
     }
 
-    /* Метод-фабрика который будет создавать фрагмент
-     * */
     public static BookShelfFragment newInstance() {
         ArrayList<String> files = new ArrayList<>();
         ArrayList<String> pathes = new ArrayList<>();
@@ -86,10 +78,6 @@ public class BookShelfFragment extends Fragment {
         getActivity().getActionBar().setTitle(Params.MENU_TITLES[Params.MENU_BOOK_SHELF]);
     }
 
-    /*
-    * данный метод нужен для того что бы привязать главное активити (создание слушателя)
-    * для последующей обработки события в главном активити
-    * */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
