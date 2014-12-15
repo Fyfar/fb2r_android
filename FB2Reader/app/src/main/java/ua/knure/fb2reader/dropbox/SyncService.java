@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.dropbox.sync.android.DbxAccountManager;
 import com.dropbox.sync.android.DbxException.Unauthorized;
@@ -89,11 +90,9 @@ public class SyncService extends Service {
             e.printStackTrace();
         }
         try {
-            if (json.has("books")) {
-                JSONArray arr = json.getJSONArray("books");
-                for (int i = 0; i < arr.length(); i++) {
-                    DAO.updateBooks(arr, email);
-                }
+            JSONArray arr = json.getJSONArray("books");
+            for (int i = 0; i < arr.length(); i++) {
+                DAO.updateBooks(arr, email);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -108,11 +107,9 @@ public class SyncService extends Service {
             e.printStackTrace();
         }
         try {
-            if (json.has("bookmarks")) {
-                JSONArray arr = json.getJSONArray("bookmarks");
-                for (int i = 0; i < arr.length(); i++) {
-                    DAO.updateBookmarks(arr, email);
-                }
+            JSONArray arr = json.getJSONArray("bookmarks");
+            for (int i = 0; i < arr.length(); i++) {
+                DAO.updateBookmarks(arr, email);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -225,10 +222,8 @@ public class SyncService extends Service {
 
             if (responseBody != null) {
                 JSONObject json = new JSONObject(responseBody);
-                if (json.has("books")) {
-                    JSONArray arr = json.getJSONArray("books");
-                    dao.updateBooks(arr, email);
-                }
+                JSONArray arr = json.getJSONArray("books");
+                DAO.updateBooks(arr, email);
             }
         } catch (IOException | JSONException e) {
             e.printStackTrace();
@@ -237,9 +232,6 @@ public class SyncService extends Service {
     }
 
     public void postBookMarks(BookBookmark bookmark) {
-        // Create a new HttpClient and Post Header
-        InputStream inputStream = null;
-        String result = "";
         HttpClient httpclient = new DefaultHttpClient();
         HttpPost httppost = new HttpPost(URL + "/bookmark/" + ViewUtils.md5(email));
         List<NameValuePair> nameValuePairs = new ArrayList<>(5);
@@ -268,10 +260,9 @@ public class SyncService extends Service {
 
             if (responseBody != null) {
                 JSONObject json = new JSONObject(responseBody);
-                if (json.has("bookmarks")) {
-                    JSONArray arr = json.getJSONArray("bookmarks");
-                    DAO.updateBooks(arr, email);
-                }
+                Log.d("myLogs", responseBody);
+                JSONArray arr = json.getJSONArray("bookmarks");
+                DAO.updateBookmarks(arr, email);
             }
         } catch (IOException | JSONException e) {
             e.printStackTrace();
@@ -287,18 +278,19 @@ public class SyncService extends Service {
                 postBooks(book);
 
             }
-            if (books.size() == 0) {
-                String res = GET(URL + "/bookmark");
-                addBooksToDB(res);
-            }
             List<BookBookmark> bookmarks = DAO.getAllBookmarks(email);
             for (BookBookmark bookmark : bookmarks) {
+                Log.d("myLogs", bookmark + "bookmark");
                 postBookMarks(bookmark);
             }
-            if (bookmarks.size() == 0) {
-                String res = GET(URL + "/bookmark");
-                addBookMarksToDB(res);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+            String res = GET(URL + "/bookmark");
+            addBooksToDB(res);
+            addBookMarksToDB(res);
             return "";
         }
     }

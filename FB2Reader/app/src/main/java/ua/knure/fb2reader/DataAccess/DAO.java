@@ -87,12 +87,12 @@ public class DAO {
         return -1;
     }
 
-    public static boolean addBookmark(String email, String bookmarkName, String bookmarkText
+    public static long addBookmark(String email, String bookmarkName, String bookmarkText
             , int pageNumber, int charsCount, String bookName) {
         ContentValues cv = new ContentValues();
         int userId = getUserId(email);
         if (userId == -1) {
-            return false;
+            return -1;
         }
         cv.put(USER_ID, userId);
         cv.put(BOOKMARK_NAME, bookmarkName);
@@ -100,8 +100,7 @@ public class DAO {
         cv.put(PAGE_NUMBER, pageNumber);
         cv.put(CHARS_COUNTER, charsCount);
         cv.put("bookId", getBookId(bookName));
-        db.insert(BOOKMARKS_TABLE, null, cv);
-        return true;
+        return db.insert(BOOKMARKS_TABLE, null, cv);
     }
 
     public static boolean checkRec(String checking, String table, String column) {
