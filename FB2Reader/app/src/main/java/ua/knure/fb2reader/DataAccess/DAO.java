@@ -7,7 +7,6 @@ import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,10 +21,10 @@ import ua.knure.fb2reader.Book.BookBookmark;
 
 public class DAO {
 
+    public static final String BOOKS_TABLE = "books";
     private static final String USER_TABLE = "users";
     private static final String EMAIL_COLUMN = "email";
     private static final String NAME_COLUMN = "user_name";
-    public static final String BOOKS_TABLE = "books";
     private static final String BOOK_NAME = "book_name";
     private static final String LAST_CHAR = "lastChar";
     private static final String DATETIME = "updateTime";
@@ -48,33 +47,20 @@ public class DAO {
             + "foreign key (bookId) references books (id));";
     private static final String DB_NAME = "library";
     private static final int DB_VERSION = 1;
-
+    private static SQLiteDatabase db;
+    private static DAO dao;
     private Context ctx;
     private DBHelper mDBHelper;
-    private static SQLiteDatabase db;
-
-    private static DAO dao;
 
     private DAO(Context ctx) {
         this.ctx = ctx;
     }
 
-    public synchronized static DAO getInstance(Context ctx)  {
-        if(dao == null) {
+    public synchronized static DAO getInstance(Context ctx) {
+        if (dao == null) {
             dao = new DAO(ctx);
         }
         return dao;
-    }
-
-    public void open() {
-        mDBHelper = new DBHelper(ctx, DB_NAME, null, DB_VERSION, null);
-        db = mDBHelper.getWritableDatabase();
-    }
-
-    public void close() {
-        if (mDBHelper != null) {
-            mDBHelper.close();
-        }
     }
 
     public static Cursor getAllData(String table) {
@@ -99,6 +85,148 @@ public class DAO {
             return user.getInt(user.getColumnIndex("id"));
         }
         return -1;
+    }
+
+    public static boolean addBookmark(String email, String bookmarkName, String bookmarkText
+            , int pageNumber, int charsCount, String bookName) {
+        ContentValues cv = new ContentValues();
+        int userId = getUserId(email);
+        if (userId == -1) {
+            return false;
+        }
+        cv.put(USER_ID, userId);
+        cv.put(BOOKMARK_NAME, bookmarkName);
+        cv.put(BOOKMARK_TEXT, bookmarkText);
+        cv.put(PAGE_NUMBER, pageNumber);
+        cv.put(CHARS_COUNTER, charsCount);
+        cv.put("bookId", getBookId(bookName));
+        db.insert(BOOKMARKS_TABLE, null, cv);
+        return true;
+    }
+
+    public static boolean checkRec(String checking, String table, String column) {
+        Cursor c = getAllData(table);
+        if (c.moveToFirst()) {
+            do {
+                if (c.getString(c.getColumnIndex(column)).equals(checking)) {
+                    c.close();
+                    return true;
+                }
+            } while (c.moveToNext());
+        }
+        c.close();
+        return false;
+    }
+
+    public static boolean updateBook(String table, Date updateTime, int lastChar, String book, String email) {
+        if (!checkRec(book, BOOKS_TABLE, BOOK_NAME)) {
+            return false;
+        }
+        ContentValues cv = new ContentValues();
+        cv.put(DATETIME, updateTime.toString());
+        cv.put(LAST_CHAR, lastChar);
+        Cursor c = getUserByEmail(email);
+        int id = c.getInt(c.getColumnIndex("id"));
+        String where = "userId=" + id + " and book_name=\"" + book + "\"";
+        return db.update(table, cv, where, null) > 0;
+    }
+
+    public static boolean updateBookmark(int charsCount, String bookName
+            , String bookmarkName, String text, String email, int pageNumber) {
+        if (!checkRec(bookmarkName, BOOKMARKS_TABLE, BOOKMARK_NAME)) {
+            return false;
+        }
+        ContentValues cv = new ContentValues();
+        cv.put(CHARS_COUNTER, charsCount);
+        cv.put("bookId", getBookId(bookName));
+        cv.put(BOOKMARK_NAME, bookmarkName);
+        cv.put(BOOKMARK_TEXT, text);
+        cv.put(PAGE_NUMBER, pageNumber);
+        Cursor c = getUserByEmail(email);
+        int id = c.getInt(c.getColumnIndex("id"));
+        String where = "userId=" + id + " and bookmark_name=\"" + bookmarkName + "\"";
+        return db.update(BOOKMARKS_TABLE, cv, where, null) > 0;
+    }
+
+    public static BookDAO getBook(String email, String bookName) {
+        BookDAO book = new BookDAO();
+        int userId = getUserId(email);
+        Cursor all = getAllData(BOOKS_TABLE);
+        if (all.moveToFirst()) {
+            do {
+                if (all.getInt(all.getColumnIndex(USER_ID)) == userId
+                        && bookName.equals(all.getString(all.getColumnIndex(BOOK_NAME)))) {
+                    book.setBookName(bookName);
+                    book.setLastChar(all.getInt(all.getColumnIndex(LAST_CHAR)));
+                    all.close();
+                    return book;
+                }
+            } while (all.moveToNext());
+        }
+        all.close();
+        return null;
+    }
+
+    public static List<BookBookmark> getAllBookmarks(String email) {
+        Cursor all = getAllData(BOOKMARKS_TABLE);
+        List<BookBookmark> bookmarks = new ArrayList<>();
+        if (all.moveToFirst()) {
+            int userId = getUserId(email);
+            do {
+                if (all.getInt(all.getColumnIndex(USER_ID)) == userId) {
+                    int page = all.getColumnIndex(PAGE_NUMBER);
+                    String text = all.getString(all.getColumnIndex(BOOKMARK_TEXT));
+                    String name = all.getString(all.getColumnIndex(BOOKMARK_NAME));
+                    int chars = all.getInt(all.getColumnIndex(CHARS_COUNTER));
+                    BookBookmark bookmark = new BookBookmark(page, chars, text, name);
+                    bookmark.setBookName(getBookName(all.getInt(all.getColumnIndex("bookId"))));
+                    bookmarks.add(bookmark);
+                }
+            } while (all.moveToNext());
+        }
+        all.close();
+        return bookmarks;
+    }
+
+    private static String getBookName(int id) {
+        String name = "";
+        Cursor c = getAllData(BOOKS_TABLE);
+        if (c.moveToFirst()) {
+            do {
+                if (c.getInt(c.getColumnIndex("id")) == id) {
+                    name = c.getString(c.getColumnIndex(BOOK_NAME));
+                    break;
+                }
+            } while (c.moveToNext());
+        }
+        c.close();
+        return name;
+    }
+
+    private static int getBookId(String name) {
+        int id = -1;
+        Cursor c = getAllData(BOOKS_TABLE);
+        if (c.moveToFirst()) {
+            do {
+                if (c.getString(c.getColumnIndex(BOOK_NAME)).equals(name)) {
+                    id = c.getInt(c.getColumnIndex("id"));
+                    break;
+                }
+            } while (c.moveToNext());
+        }
+        c.close();
+        return id;
+    }
+
+    public void open() {
+        mDBHelper = new DBHelper(ctx, DB_NAME, null, DB_VERSION, null);
+        db = mDBHelper.getWritableDatabase();
+    }
+
+    public void close() {
+        if (mDBHelper != null) {
+            mDBHelper.close();
+        }
     }
 
     public boolean dbIsOpen() {
@@ -136,50 +264,7 @@ public class DAO {
         }
     }
 
-    public static boolean addBookMark(String email, String bookmarkName, String bookmarkText
-            , int pageNumber, int charsCount) {
-        ContentValues cv = new ContentValues();
-        int userId = getUserId(email);
-        if(userId == -1) {
-            return false;
-        }
-        cv.put(USER_ID, userId);
-        cv.put(BOOKMARK_NAME, bookmarkName);
-        cv.put(BOOKMARK_TEXT, bookmarkText);
-        cv.put(PAGE_NUMBER, pageNumber);
-        cv.put(CHARS_COUNTER, charsCount);
-        db.insert(BOOKMARKS_TABLE, null, cv);
-        return true;
-    }
-
-    public static boolean checkRec(String checking, String table, String column) {
-        Cursor c = getAllData(table);
-        if (c.moveToFirst()) {
-            do {
-                if (c.getString(c.getColumnIndex(column)).equals(checking)) {
-                    c.close();
-                    return true;
-                }
-            } while (c.moveToNext());
-        }
-        c.close();
-        return false;
-    }
-
-    public static boolean updateBook(String table, Date updateTime, int lastChar, String book, String email) {
-        if(!checkRec(book, BOOKS_TABLE, BOOK_NAME)) {
-            return false;
-        }
-        ContentValues cv = new ContentValues();
-        cv.put(DATETIME, updateTime.toString());
-        cv.put(LAST_CHAR, lastChar);
-        Cursor c = getUserByEmail(email);
-        int id = c.getInt(c.getColumnIndex("id"));
-        String where = "userId=" + id + " and book_name=\"" + book + "\"";
-        return db.update(table, cv, where, null) > 0;
-    }
-
-    public void updateBooks(JSONArray arr, String email) {
+    public static void updateBooks(JSONArray arr, String email) {
         try {
             for (int i = 0; i < arr.length(); i++) {
                 updateBook(BOOKS_TABLE, new Date()
@@ -191,23 +276,26 @@ public class DAO {
         }
     }
 
-    public static BookDAO getBook(String email, String bookName) {
-        BookDAO book = new BookDAO();
-        int userId = getUserId(email);
-        Cursor all = getAllData(BOOKS_TABLE);
-        if(all.moveToFirst()) {
-            do {
-                if(all.getInt(all.getColumnIndex(USER_ID)) == userId
-                        && bookName.equals(all.getString(all.getColumnIndex(BOOK_NAME)))) {
-                    book.setBookName(bookName);
-                    book.setLastChar(all.getInt(all.getColumnIndex(LAST_CHAR)));
-                    all.close();
-                    return book;
+    public static void updateBookmarks(JSONArray arr, String email) {
+        try {
+            for (int i = 0; i < arr.length(); i++) {
+                if (!checkRec(arr.getJSONObject(i).getString("name"), BOOKMARKS_TABLE, BOOKMARK_NAME)) {
+                    addBookmark(email, arr.getJSONObject(i).getString("name")
+                            , arr.getJSONObject(i).getString("text")
+                            , arr.getJSONObject(i).getInt("pageNumber")
+                            , arr.getJSONObject(i).getInt("lastChar")
+                            , arr.getJSONObject(i).getString("bookName"));
+                } else  {
+                    updateBookmark(arr.getJSONObject(i).getInt("lastChar")
+                            , arr.getJSONObject(i).getString("bookName")
+                            , arr.getJSONObject(i).getString("name")
+                            , arr.getJSONObject(i).getString("text"), email
+                            ,  arr.getJSONObject(i).getInt("pageNumber"));
                 }
-            } while(all.moveToNext());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        all.close();
-        return null;
     }
 
     public List<BookDAO> getAllBooks(String email) {
@@ -225,25 +313,8 @@ public class DAO {
                 }
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return books;
-    }
-
-    public static List<BookBookmark> getAllBookmarks(String email) {
-        Cursor all = getAllData(BOOKMARKS_TABLE);
-        List<BookBookmark> bookmarks = new ArrayList<>();
-        if(all.moveToFirst()) {
-            int userId = getUserId(email);
-            do {
-                if(all.getInt(all.getColumnIndex(USER_ID)) == userId) {
-                    int page = all.getColumnIndex(PAGE_NUMBER);
-                    String text = all.getString(all.getColumnIndex(BOOKMARK_TEXT));
-                    String name = all.getString(all.getColumnIndex(BOOKMARK_NAME));
-                    int chars = all.getInt(all.getColumnIndex(CHARS_COUNTER));
-                    bookmarks.add(new BookBookmark(page, chars, text, name));
-                }
-            } while(all.moveToNext());
-        }
-        return bookmarks;
     }
 
     private class DBHelper extends SQLiteOpenHelper {

@@ -148,9 +148,6 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
     @Override
     protected void onDestroy() {
         stopService(new Intent(this, SyncService.class));
-        if (dao.dbIsOpen()) {
-            dao.close();
-        }
         super.onDestroy();
     }
 
@@ -336,9 +333,9 @@ public class MainActivity extends ActionBarActivity implements BookShelfFragment
         lastOpenedBook.addBookmark(page, charsCounter, text, name);
         String email = PreferenceManager.getDefaultSharedPreferences(getBaseContext())
                 .getString("email", "");
-        DAO.addBookMark(email, name, text, page, charsCounter);
-        //Log.d("myLogs", "[bookmarkName = " + name + " charsCounter = "
-        //        + charsCounter + " pageNumber = " + page + " text = " + text + "]");
+        String bookName = PreferenceManager.getDefaultSharedPreferences(getBaseContext())
+                .getString("currentBook", "");
+        DAO.addBookmark(email, name, text, page, charsCounter, bookName);
     }
 
     /*

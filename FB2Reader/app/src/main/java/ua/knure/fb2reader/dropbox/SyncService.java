@@ -1,14 +1,10 @@
 package ua.knure.fb2reader.dropbox;
 
-import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.dropbox.sync.android.DbxAccountManager;
 import com.dropbox.sync.android.DbxException.Unauthorized;
@@ -39,6 +35,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ua.knure.fb2reader.Book.BookBookmark;
 import ua.knure.fb2reader.DataAccess.BookDAO;
 import ua.knure.fb2reader.DataAccess.DAO;
 import ua.knure.fb2reader.Utils.PathListener;
@@ -47,18 +44,91 @@ import ua.knure.fb2reader.Utils.ViewUtils;
 public class SyncService extends Service {
 
     static final int REQUEST_LINK_TO_DBX = 0;
+    private static final String URL = "https://fb2r-university.rhcloud.com/dropbox";
+    private static String email;
     private final String APP_KEY = "ygam033j049nurm";
     private final String APP_SECRET = "8jbe7gnyi4y9imt";
-    private static final String URL = "https://fb2r-university.rhcloud.com/dropbox";
-
     private DbxFileSystem dbxFs;
     private DbxAccountManager mDbxAcctMgr;
     private DAO dao;
-
     private Timer tC;
     private TimerTask tt;
 
-    private static String email;
+    public static String GET(String url) {
+        InputStream inputStream = null;
+        String result = "";
+        try {
+
+            // create HttpClient
+            HttpClient httpclient = new DefaultHttpClient();
+
+            // make GET request to the given URL
+            HttpResponse httpResponse = httpclient.execute(new HttpGet(url + "/" + ViewUtils.md5(email)));
+
+            // receive response as inputStream
+            inputStream = httpResponse.getEntity().getContent();
+
+            // convert inputstream to string
+            if (inputStream != null)
+                result = convertInputStreamToString(inputStream);
+            else
+                result = "Did not work!";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    private static void addBooksToDB(String result) {
+        JSONObject json = null;
+        try {
+            json = new JSONObject(result);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        try {
+            if (json.has("books")) {
+                JSONArray arr = json.getJSONArray("books");
+                for (int i = 0; i < arr.length(); i++) {
+                    DAO.updateBooks(arr, email);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void addBookMarksToDB(String result) {
+        JSONObject json = null;
+        try {
+            json = new JSONObject(result);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        try {
+            if (json.has("bookmarks")) {
+                JSONArray arr = json.getJSONArray("bookmarks");
+                for (int i = 0; i < arr.length(); i++) {
+                    DAO.updateBookmarks(arr, email);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        String line = "";
+        String result = "";
+        while ((line = bufferedReader.readLine()) != null)
+            result += line;
+
+        inputStream.close();
+        return result;
+    }
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -72,13 +142,15 @@ public class SyncService extends Service {
         } catch (InvalidPathException | IOException e) {
             e.printStackTrace();
         }
-        //startTimers();
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (dao.dbIsOpen()) {
+            dao.close();
+        }
     }
 
     private void initialize() throws InvalidPathException, IOException {
@@ -87,7 +159,6 @@ public class SyncService extends Service {
         dao = DAO.getInstance(getBaseContext());
         dao.open();
         try {
-            Log.d("myLogs", "dbFx init");
             dbxFs = DbxFileSystem.forAccount(mDbxAcctMgr.getLinkedAccount());
         } catch (Unauthorized e) {
             e.printStackTrace();
@@ -120,7 +191,6 @@ public class SyncService extends Service {
 
             @Override
             public void run() {
-                Log.d("myLogs", "tick");
                 try {
                     PathListener.downloadFiles(dbxFs, new DbxPath("/"));
                     PathListener.uploadFiles(dbxFs);
@@ -133,13 +203,10 @@ public class SyncService extends Service {
         };
     }
 
-    public void postData(BookDAO book) {
+    public void postBooks(BookDAO book) {
         // Create a new HttpClient and Post Header
-        InputStream inputStream = null;
-        String result = "";
         HttpClient httpclient = new DefaultHttpClient();
         HttpPost httppost = new HttpPost(URL + "/" + ViewUtils.md5(email));
-        Log.d("myLogs", "post Data");
         List<NameValuePair> nameValuePairs = new ArrayList<>(2);
         nameValuePairs.add(new BasicNameValuePair("lastChar", String.valueOf(book.getLastChar())));
         nameValuePairs.add(new BasicNameValuePair("bookName", book.getBookName()));
@@ -155,66 +222,59 @@ public class SyncService extends Service {
             String responseBody = EntityUtils.toString(response.getEntity());
 
             if (responseBody != null) {
-                // Log.d("myLogs", " json = " + book.getBookName() + " " + book.getLastChar());
                 JSONObject json = new JSONObject(responseBody);
-                Log.d("myLogs", " json = " + book.getBookName() + " " + book.getLastChar() + " " + json.toString());
-               // Log.d("myLogs", "status = " + json.getString("status"));
-                JSONArray arr = json.getJSONArray("books");
-                dao.updateBooks(arr, email);
-            } else
-                Log.d("myLogs", "responseBody is null");
+                if (json.has("books")) {
+                    JSONArray arr = json.getJSONArray("books");
+                    dao.updateBooks(arr, email);
+                }
+            }
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
 
     }
 
-    public static String GET(String url) {
+    public void postBookMarks(BookBookmark bookmark) {
+        // Create a new HttpClient and Post Header
         InputStream inputStream = null;
         String result = "";
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost(URL + "/bookmark/" + ViewUtils.md5(email));
+        List<NameValuePair> nameValuePairs = new ArrayList<>(5);
         try {
-
-            // create HttpClient
-            HttpClient httpclient = new DefaultHttpClient();
-
-            // make GET request to the given URL
-            HttpResponse httpResponse = httpclient.execute(new HttpGet(url + "/" + ViewUtils.md5(email)));
-
-            // receive response as inputStream
-            inputStream = httpResponse.getEntity().getContent();
-
-            // convert inputstream to string
-            if (inputStream != null)
-                result = convertInputStreamToString(inputStream);
-            else
-                result = "Did not work!";
-
-        } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
+            byte[] b = bookmark.getBookName().getBytes("UTF-8");
+            nameValuePairs.add(new BasicNameValuePair("lastChar", String.valueOf(bookmark.getCharsCounter())));
+            nameValuePairs.add(new BasicNameValuePair("bookName", new String(b, "UTF-8")));
+            b = bookmark.getBookmarkName().getBytes("UTF-8");
+            nameValuePairs.add(new BasicNameValuePair("bookmarkName", new String(b, "UTF-8")));
+            b = bookmark.getText().getBytes("UTF-8");
+            nameValuePairs.add(new BasicNameValuePair("text", new String(b, "UTF-8")));
+            nameValuePairs.add(new BasicNameValuePair("pageNumber", String.valueOf(bookmark.getPageNumber())));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        try {
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
 
-        return result;
-    }
+        // Execute HTTP Post Request
+        try {
+            HttpResponse response = httpclient.execute(httppost);
+            String responseBody = EntityUtils.toString(response.getEntity());
 
-    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        String line = "";
-        String result = "";
-        while ((line = bufferedReader.readLine()) != null)
-            //Log.d("myLogs", line);
-            result += line;
+            if (responseBody != null) {
+                JSONObject json = new JSONObject(responseBody);
+                if (json.has("bookmarks")) {
+                    JSONArray arr = json.getJSONArray("bookmarks");
+                    DAO.updateBooks(arr, email);
+                }
+            }
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
 
-        inputStream.close();
-        return result;
-    }
-
-    public boolean isConnected() {
-        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected())
-            return true;
-        else
-            return false;
     }
 
     private class HttpAsyncTask extends AsyncTask<String, Void, String> {
@@ -222,34 +282,22 @@ public class SyncService extends Service {
         protected String doInBackground(String... urls) {
             List<BookDAO> books = dao.getAllBooks(email);
             for (BookDAO book : books) {
-                postData(book);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            return "";//GET(urls[0]);
-        }
+                postBooks(book);
 
-        // onPostExecute displays the results of the AsyncTask.
-        @Override
-        protected void onPostExecute(String result) {
-          /*  //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
-            JSONObject json = null;
-            try {
-                json = new JSONObject(result);
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
-            try {
-                JSONArray arr = (JSONArray)json.get("contents");
-                for(int i = 0; i < arr.length(); i++) {
-                    Log.d("myLogs", "book " + i + " = " + arr.get(i));
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }*/
+            if (books.size() == 0) {
+                String res = GET(URL + "/bookmark");
+                addBooksToDB(res);
+            }
+            List<BookBookmark> bookmarks = DAO.getAllBookmarks(email);
+            for (BookBookmark bookmark : bookmarks) {
+                postBookMarks(bookmark);
+            }
+            if (bookmarks.size() == 0) {
+                String res = GET(URL + "/bookmark");
+                addBookMarksToDB(res);
+            }
+            return "";
         }
     }
 }

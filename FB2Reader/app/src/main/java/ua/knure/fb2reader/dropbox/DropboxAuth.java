@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
@@ -20,7 +18,6 @@ import ua.knure.fb2reader.R;
 import ua.knure.fb2reader.Utils.ViewUtils;
 import ua.knure.fb2reader.Views.Activities.MainActivity;
 import ua.knure.fb2reader.DataAccess.DAO;
-import ua.knure.fb2reader.Utils.AccountInfo;
 import ua.knure.fb2reader.Views.SplashActivity;
 
 public class DropboxAuth extends Activity {
