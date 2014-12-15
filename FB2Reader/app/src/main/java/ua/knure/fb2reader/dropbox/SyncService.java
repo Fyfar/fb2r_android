@@ -57,6 +57,7 @@ public class SyncService extends Service {
     private DAO dao;
     private Timer tC;
     private TimerTask tt;
+    private HttpAsyncTask task;
 
     public static String GET(String url) {
         InputStream inputStream = null;
@@ -95,7 +96,9 @@ public class SyncService extends Service {
         try {
             JSONArray arr = json.getJSONArray("books");
             for (int i = 0; i < arr.length(); i++) {
-                DAO.updateBooks(arr, email);
+                if(DAO.dbIsOpen()) {
+                    DAO.updateBooks(arr, email);
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -112,7 +115,9 @@ public class SyncService extends Service {
         try {
             JSONArray arr = json.getJSONArray("bookmarks");
             for (int i = 0; i < arr.length(); i++) {
-                DAO.updateBookmarks(arr, email);
+                if(DAO.dbIsOpen()) {
+                    DAO.updateBookmarks(arr, email);
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -148,7 +153,8 @@ public class SyncService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (dao.dbIsOpen()) {
+        task.cancel(true);
+        if (DAO.dbIsOpen()) {
             dao.close();
         }
         tt.cancel();
@@ -194,9 +200,12 @@ public class SyncService extends Service {
             @Override
             public void run() {
                 try {
-                    PathListener.downloadFiles(dbxFs, new DbxPath("/"));
-                    PathListener.uploadFiles(dbxFs);
-                    new HttpAsyncTask().execute(URL);
+                    if(isConnected()) {
+                        PathListener.downloadFiles(dbxFs, new DbxPath("/"));
+                        PathListener.uploadFiles(dbxFs);
+                        task = new HttpAsyncTask();
+                        task.execute(URL);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -226,7 +235,9 @@ public class SyncService extends Service {
             if (responseBody != null) {
                 JSONObject json = new JSONObject(responseBody);
                 JSONArray arr = json.getJSONArray("books");
-                DAO.updateBooks(arr, email);
+                if(DAO.dbIsOpen()) {
+                    DAO.updateBooks(arr, email);
+                }
             }
         } catch (IOException | JSONException e) {
             e.printStackTrace();
@@ -275,7 +286,9 @@ public class SyncService extends Service {
                 JSONObject json = new JSONObject(responseBody);
                 Log.d("myLogs", responseBody);
                 JSONArray arr = json.getJSONArray("bookmarks");
-                DAO.updateBookmarks(arr, email);
+                if(DAO.dbIsOpen()) {
+                    DAO.updateBookmarks(arr, email);
+                }
             }
         } catch (IOException | JSONException e) {
             e.printStackTrace();
@@ -293,7 +306,6 @@ public class SyncService extends Service {
             }
             List<BookBookmark> bookmarks = DAO.getAllBookmarks(email);
             for (BookBookmark bookmark : bookmarks) {
-                Log.d("myLogs", bookmark + "bookmark");
                 postBookMarks(bookmark);
             }
             try {

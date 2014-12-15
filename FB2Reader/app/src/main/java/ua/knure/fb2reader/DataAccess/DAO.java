@@ -228,7 +228,7 @@ public class DAO {
         }
     }
 
-    public boolean dbIsOpen() {
+    public static boolean dbIsOpen() {
         return db.isOpen();
     }
 
