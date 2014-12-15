@@ -153,7 +153,6 @@ public class SyncService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        task.cancel(true);
         if (DAO.dbIsOpen()) {
             dao.close();
         }
