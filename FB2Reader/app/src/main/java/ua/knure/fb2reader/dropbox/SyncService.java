@@ -151,6 +151,8 @@ public class SyncService extends Service {
         if (dao.dbIsOpen()) {
             dao.close();
         }
+        tt.cancel();
+        tC.cancel();
     }
 
     private void initialize() throws InvalidPathException, IOException {
